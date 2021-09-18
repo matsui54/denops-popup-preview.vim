@@ -75,7 +75,10 @@ export function getMarkdownFences(items: string[]) {
   return fences;
 }
 
-export function getHighlights(contents: string[]): [string[], Highlight[]] {
+export function getHighlights(
+  contents: string[],
+  opts: FloatOption,
+): [string[], Highlight[], number, number] {
   const matchers: Record<string, Matcher> = {
     block: { ft: "", begin: "```+([a-zA-Z0-9_]*)", end: "```+" }, // block
     pre: { ft: "", begin: "<pre>", end: "<\/pre>" }, // pre
@@ -131,7 +134,13 @@ export function getHighlights(contents: string[]): [string[], Highlight[]] {
       i++;
     }
   }
-  return [stripped, highlights];
+
+  const [width, height] = makeFloatingwinSize(
+    stripped,
+    opts.maxWidth,
+    opts.maxHeight,
+  );
+  return [stripped, highlights, width, height];
 }
 
 export type stylizeOptions = {
@@ -190,81 +199,60 @@ type FloatOption = {
   maxWidth: number;
   maxHeight: number;
   separator: string;
+  fences: string[];
 };
 
-export async function stylizeMarkdown(
+export async function applyMarkdownSyntax(
   denops: Denops,
-  bufnr: number,
+  winid: number,
   contents: string[],
+  highlights: Highlight[],
   opts: FloatOption,
-): Promise<[string[], number, number]> {
-  const [stripped, highlights] = getHighlights(contents);
-
-  const [width, height] = makeFloatingwinSize(
-    stripped,
-    opts.maxWidth,
-    opts.maxHeight,
-  );
-
-  const currentBufnr = await fn.bufnr(denops, "%");
+): Promise<void> {
   const fences = getMarkdownFences(
-    await vars.g.get(denops, "markdown_fenced_languages", []) as string[],
+    opts.fences,
   );
-  batch(denops, async (denops) => {
-    let index = 0;
-    let langs: Record<string, boolean> = {};
-    async function applySyntax(
-      ft: string | null,
-      start: number,
-      finish: number,
-    ) {
-      if (!ft) {
-        await denops.cmd(
-          `syntax region markdownCode start=+\\%${start}l+ end=+\\%${finish +
-            1}l+ keepend extend`,
-        );
-        return;
-      }
-      ft = fences[ft] ? fences[ft] : ft;
-      const name = ft + index;
-      index++;
-      const lang = "@" + ft.toUpperCase();
-      if (!langs[lang]) {
-        await vars.b.set(denops, "current_syntax", '');
-        await vars.b.remove(denops, "current_syntax");
-        await denops.cmd(`silent! syntax include ${lang} syntax/${ft}.vim`);
-        langs[lang] = true;
-      }
-      await denops.cmd(
-        `syntax region ${name} start=+\\%${start}l+ end=+\\%${finish +
-          1}l+ contains=${lang} keepend`,
+  let cmds: string[] = [];
+  let index = 0;
+  let langs: Record<string, boolean> = {};
+  function applySyntax(
+    ft: string | null,
+    start: number,
+    finish: number,
+  ) {
+    if (!ft) {
+      cmds.push(
+        `syntax region markdownCode start=+\\%${start}l+ end=+\\%${finish +
+          1}l+ keepend extend`,
       );
+      return;
     }
-
-    if (currentBufnr != bufnr) {
-      await denops.cmd(`noautocmd keepalt keepjumps silent ${bufnr}buffer`);
+    ft = fences[ft] ? fences[ft] : ft;
+    const name = ft + index;
+    index++;
+    const lang = "@" + ft.toUpperCase();
+    if (!langs[lang]) {
+      cmds.push("let b:current_syntax=''");
+      cmds.push("unlet b:current_syntax");
+      cmds.push(`silent! syntax include ${lang} syntax/${ft}.vim`);
+      langs[lang] = true;
     }
+    cmds.push(
+      `syntax region ${name} start=+\\%${start}l+ end=+\\%${finish +
+        1}l+ contains=${lang} keepend`,
+    );
+  }
 
-    await fn.setline(denops, 1, stripped);
-
-    let last = 1;
-    for (const hi of highlights) {
-      if (last < hi.start) {
-        await applySyntax("lsp_markdown", last, hi.start - 1);
-      }
-      await applySyntax(hi.ft, hi.start, hi.finish);
-      last = hi.finish + 1;
+  let last = 1;
+  for (const hi of highlights) {
+    if (last < hi.start) {
+      applySyntax("lsp_markdown", last, hi.start - 1);
     }
-    if (last < stripped.length) {
-      await applySyntax("lsp_markdown", last, stripped.length);
-    }
-
-    if (currentBufnr != bufnr) {
-      await denops.cmd(
-        `noautocmd keepalt keepjumps silent ${currentBufnr}buffer`,
-      );
-    }
-  });
-
-  return [stripped, width, height];
+    applySyntax(hi.ft, hi.start, hi.finish);
+    last = hi.finish + 1;
+  }
+  if (last < contents.length) {
+    applySyntax("lsp_markdown", last, contents.length);
+  }
+  await denops.call("popup_preview#doc#win_execute", winid, cmds);
 }

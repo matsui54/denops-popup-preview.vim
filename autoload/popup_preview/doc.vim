@@ -2,6 +2,7 @@ let s:Buffer = vital#popup_preview#import('VS.Vim.Buffer')
 let s:MarkupContent = vital#popup_preview#import('VS.LSP.MarkupContent')
 let s:Markdown = vital#popup_preview#import('VS.Vim.Syntax.Markdown')
 let s:FloatingWindow = vital#popup_preview#import('VS.Vim.Window.FloatingWindow')
+let s:Window = vital#popup_preview#import('VS.Vim.Window')
 
 let s:win = s:FloatingWindow.new()
 call s:win.set_var('&wrap', 1)
@@ -23,38 +24,45 @@ function! popup_preview#doc#close_floating(opts) abort
   call s:win.close()
 endfunction
 
-function! popup_preview#doc#get_buffer() abort
-  call s:ensure_buffer()
-  return s:win.get_bufnr()
+function! popup_preview#doc#get_winid() abort
+  return s:win.get_winid()
 endfunction
-" syntax: string;
-" lines: string[];
+
+function! s:execute_cmds(cmds) abort
+  for cmd in a:cmds
+    execute cmd
+  endfor
+endfunction
+
+function! popup_preview#doc#win_execute(winid, cmds) abort
+  silent call s:Window.do(a:winid, { -> s:execute_cmds(a:cmds) })
+endfunction
+
+" lines: string[]
+function! popup_preview#doc#set_buffer(opts) abort
+  call s:ensure_buffer()
+  let bufnr = s:win.get_bufnr()
+  call setbufline(bufnr, 1, a:opts.lines)
+  call setbufvar(bufnr, '&modified', 0)
+  call setbufvar(bufnr, '&bufhidden', 'hide')
+  return bufnr 
+endfunction
+
 " floatOpt: FloatOption;
 " events: autocmd.AutocmdEvent[];
-" maxWidth: number;
-" maxHeight: number;
+" width: number;
+" height: number;
 function! popup_preview#doc#show_floating(opts) abort
   if getcmdwintype() !=# '' || !pumvisible()
     call s:win.close()
-    return
+    return -1
   endif
   let opts = a:opts
   call s:ensure_buffer()
 
-  let bufnr = s:win.get_bufnr()
-  " call setbufline(bufnr, 1, opts.lines)
-  " if opts.syntax == 'markdown'
-  "   silent! call s:Buffer.do(bufnr, { -> s:Markdown.apply({ 'text': getline('^', '$') }) })
-  " elseif opts.syntax != ''
-  "   call setbufvar(bufnr, '&syntax', opts.syntax)
-  " endif
-  call setbufvar(bufnr, '&modified', 0)
-  call setbufvar(bufnr, '&bufhidden', 'hide')
-
-  let size = s:win.get_size({ 'wrap': v:true, 'maxwidth': opts.maxWidth, 'maxheight': opts.maxHeight})
   let win_opts = opts.floatOpt
-  let win_opts.width = size.width
-  let win_opts.height = size.height
+  let win_opts.width = opts.width
+  let win_opts.height = opts.height
 
   if has('nvim')
     call s:win.set_var('&winhighlight', 'NormalFloat:DdcNvimLspDocDocument,FloatBorder:DdcNvimLspDocBorder')
@@ -65,4 +73,5 @@ function! popup_preview#doc#show_floating(opts) abort
     execute printf("autocmd %s <buffer> ++once call popup_preview#doc#close_floating({})",
           \ join(opts.events, ','))
   endif
+  return s:win.get_winid()
 endfunction

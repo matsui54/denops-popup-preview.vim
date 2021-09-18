@@ -22,7 +22,7 @@ export class EventHandler {
     clearTimeout(this.docTimer);
     this.docTimer = setTimeout(async () => {
       await this.docHandler.showCompleteDoc(denops, this.config.documentation);
-    }, this.config.documentation.delay);
+    }, 50);
   }
 
   private async getConfig(denops: Denops): Promise<void> {

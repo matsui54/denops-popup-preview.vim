@@ -1,4 +1,4 @@
-import { batch, Denops, fn, op } from "./deps.ts";
+import { batch, Denops, fn, op, vars } from "./deps.ts";
 import {
   CompleteInfo,
   CompletionItem,
@@ -7,11 +7,9 @@ import {
 } from "./types.ts";
 import { DocConfig } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
-import { stylizeMarkdown } from "./markdown.ts";
+import { applyMarkdownSyntax, getHighlights } from "./markdown.ts";
 
 export class DocHandler {
-  private bufnr: number;
-
   private async showFloating(
     denops: Denops,
     lines: string[],
@@ -38,30 +36,44 @@ export class DocHandler {
       col: col + 1,
       border: config.border,
     };
-    const opts = {
-      syntax: syntax,
-      lines: lines,
-      floatOpt: floatingOpt,
-      events: ["InsertLeave", "CursorMovedI"],
+    const fences = await vars.g.get(
+      denops,
+      "markdown_fenced_languages",
+      [],
+    ) as string[];
+    const [stripped, highlights, width, height] = getHighlights(lines, {
       maxWidth: maxWidth,
       maxHeight: maxHeight,
-      blend: config.winblend,
-    };
-    const bufnr = await denops.call("popup_preview#doc#get_buffer") as number;
-    await fn.deletebufline(denops, bufnr, 1, '$');
-    if (opts.syntax == "markdown") {
-      await stylizeMarkdown(denops, bufnr, opts.lines, {
-        maxWidth: maxWidth,
-        maxHeight: maxHeight,
-        separator: "",
-      });
-    } else {
-      await fn.setbufline(denops, bufnr, 1, opts.lines);
-      if (opts.syntax) {
-        await fn.setbufvar(denops, bufnr, "&syntax", opts.syntax);
+      separator: "",
+      fences: fences,
+    });
+    const bufnr = await denops.call("popup_preview#doc#set_buffer", {
+      lines: stripped,
+    }) as number;
+    const winid = await denops.call(
+      "popup_preview#doc#get_winid",
+    ) as number;
+    batch(denops, async (denops) => {
+      await denops.call(
+        "popup_preview#doc#show_floating",
+        {
+          floatOpt: floatingOpt,
+          events: ["InsertLeave", "CursorMovedI"],
+          width: width,
+          height: height,
+        },
+      ) as number;
+      if (syntax == "markdown") {
+        await applyMarkdownSyntax(denops, winid, stripped, highlights, {
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
+          separator: "",
+          fences: fences,
+        });
+      } else if (syntax) {
+        await fn.setbufvar(denops, bufnr, "&syntax", syntax);
       }
-    }
-    await denops.call("popup_preview#doc#show_floating", opts);
+    });
   }
 
   async showCompleteDoc(
@@ -83,8 +95,8 @@ export class DocHandler {
     }
     const item = info["items"][info["selected"]];
     const maybe = await searchUserdata(denops, item, config);
-    if (!maybe) {
-      this.closeWin(denops);
+    if ("close" in maybe) {
+      if (maybe.close) this.closeWin(denops);
       return;
     }
     this.showFloating(denops, maybe.lines, maybe.syntax, config);
@@ -92,7 +104,7 @@ export class DocHandler {
 
   async showLspDoc(denops: Denops, item: CompletionItem, config: DocConfig) {
     const maybe = getLspContents(item, await op.filetype.getLocal(denops));
-    if (!maybe) return;
+    if ("close" in maybe) return;
     this.showFloating(denops, maybe.lines, maybe.syntax, config);
   }
 

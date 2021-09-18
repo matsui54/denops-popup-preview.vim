@@ -11,7 +11,7 @@ import { convertInputToMarkdownLines } from "./markdown.ts";
 type DocContents = {
   syntax: string;
   lines: string[];
-} | null;
+} | { close: boolean };
 
 function getUltisnipsSnippets(
   item: UltisnipsData,
@@ -37,7 +37,7 @@ function getInfoField(
   if (config.supportInfo && item.info && item.info.length) {
     return { syntax: "plaintext", lines: item.info.split("\n") };
   }
-  return null;
+  return { close: true };
 }
 
 export function getLspContents(
@@ -58,7 +58,7 @@ export function getLspContents(
   }
 
   if (!lines.length) {
-    return null;
+    return { close: true };
   }
   return { lines: lines, syntax: "markdown" };
 }
@@ -102,7 +102,7 @@ export async function searchUserdata(
         "require('popup_preview.nvimlsp').get_resolved_item(_A.arg)",
         { arg: { decoded: decoded.lspitem } },
       );
-      return null;
+      return { close: false };
     }
   }
 
@@ -115,7 +115,7 @@ export async function searchUserdata(
   if (config.supportUltisnips && "ultisnips" in decoded) {
     const texts = getUltisnipsSnippets(decoded);
     if (texts) return { syntax: filetype, lines: texts };
-    else return null;
+    else return { close: true };
   }
 
   // unknown object. search for info item
