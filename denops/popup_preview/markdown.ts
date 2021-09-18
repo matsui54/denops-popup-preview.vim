@@ -202,13 +202,13 @@ type FloatOption = {
   fences: string[];
 };
 
-export async function applyMarkdownSyntax(
+export function applyMarkdownSyntax(
   denops: Denops,
   winid: number,
   contents: string[],
   highlights: Highlight[],
   opts: FloatOption,
-): Promise<void> {
+): string[] {
   const fences = getMarkdownFences(
     opts.fences,
   );
@@ -246,13 +246,14 @@ export async function applyMarkdownSyntax(
   let last = 1;
   for (const hi of highlights) {
     if (last < hi.start) {
-      applySyntax("lsp_markdown", last, hi.start - 1);
+      applySyntax("popup_preview_markdown", last, hi.start - 1);
     }
     applySyntax(hi.ft, hi.start, hi.finish);
     last = hi.finish + 1;
   }
   if (last < contents.length) {
-    applySyntax("lsp_markdown", last, contents.length);
+    applySyntax("popup_preview_markdown", last, contents.length);
   }
-  await denops.call("popup_preview#doc#win_execute", winid, cmds);
+  // await denops.call("popup_preview#doc#win_execute", winid, cmds);
+  return cmds;
 }

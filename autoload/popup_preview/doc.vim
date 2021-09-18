@@ -52,23 +52,29 @@ endfunction
 " events: autocmd.AutocmdEvent[];
 " width: number;
 " height: number;
+" cmds: string[]
 function! popup_preview#doc#show_floating(opts) abort
   if getcmdwintype() !=# '' || !pumvisible()
     call s:win.close()
     return -1
   endif
   let opts = a:opts
-  call s:ensure_buffer()
+  " call s:ensure_buffer()
+  call popup_preview#doc#set_buffer(opts)
 
   let win_opts = opts.floatOpt
   let win_opts.width = opts.width
   let win_opts.height = opts.height
 
+  call s:win.open(win_opts)
+  if has_key(opts, 'cmds') && len(opts.cmds)
+    call win_execute(s:win.get_winid(), join(opts.cmds, "\n"), 'silent')
+    " call s:Window.do(s:win.get_winid(), { -> s:execute_cmds(opts.cmds) })
+  endif
+
   if has('nvim')
     call s:win.set_var('&winhighlight', 'NormalFloat:DdcNvimLspDocDocument,FloatBorder:DdcNvimLspDocBorder')
   endif
-
-  call s:win.open(win_opts)
   if len(opts.events)
     execute printf("autocmd %s <buffer> ++once call popup_preview#doc#close_floating({})",
           \ join(opts.events, ','))

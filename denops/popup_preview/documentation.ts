@@ -47,32 +47,36 @@ export class DocHandler {
       separator: "",
       fences: fences,
     });
-    const bufnr = await denops.call("popup_preview#doc#set_buffer", {
-      lines: stripped,
-    }) as number;
-    const winid = await denops.call(
-      "popup_preview#doc#get_winid",
-    ) as number;
+    // const bufnr = await denops.call("popup_preview#doc#set_buffer", {
+    //   lines: stripped,
+    // }) as number;
+    // const winid = await denops.call(
+    //   "popup_preview#doc#get_winid",
+    // ) as number;
+    let cmds:string[] = [];
+    if (syntax == "markdown") {
+      cmds = applyMarkdownSyntax(denops, -1, stripped, highlights, {
+        maxWidth: maxWidth,
+        maxHeight: maxHeight,
+        separator: "",
+        fences: fences,
+      });
+    }
     batch(denops, async (denops) => {
       await denops.call(
         "popup_preview#doc#show_floating",
         {
+          lines: stripped,
           floatOpt: floatingOpt,
           events: ["InsertLeave", "CursorMovedI"],
           width: width,
           height: height,
+          cmds: cmds,
         },
       ) as number;
-      if (syntax == "markdown") {
-        await applyMarkdownSyntax(denops, winid, stripped, highlights, {
-          maxWidth: maxWidth,
-          maxHeight: maxHeight,
-          separator: "",
-          fences: fences,
-        });
-      } else if (syntax) {
-        await fn.setbufvar(denops, bufnr, "&syntax", syntax);
-      }
+      // if (syntax && syntax != "markdown") {
+      //   await fn.setbufvar(denops, bufnr, "&syntax", syntax);
+      // }
     });
   }
 
