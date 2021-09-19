@@ -22,6 +22,11 @@ export type DdcLspData = {
   lspitem: CompletionItem;
 };
 
+export type VimLspData = {
+  "completion_item"?: CompletionItem;
+  "server_name": string;
+} | undefined;
+
 export type VsnipData = {
   vsnip: {
     "snippet": string[];

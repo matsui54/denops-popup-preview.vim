@@ -4,6 +4,7 @@ import {
   JsonUserData,
   UltisnipsData,
   VimCompleteItem,
+  VimLspData,
 } from "./types.ts";
 import { DocConfig } from "./config.ts";
 import { convertInputToMarkdownLines } from "./markdown.ts";
@@ -92,6 +93,21 @@ export async function searchUserdata(
   // neither json nor string
   if (!decoded) {
     return getInfoField(item, config);
+  }
+
+  // vim-lsp
+  if ("vim-lsp/key" in decoded) {
+    const lspitem = await denops.call(
+      "lsp#omni#get_managed_user_data_from_completed_item",
+      item,
+    ) as VimLspData;
+    if (!lspitem?.completion_item) return { close: true };
+    if (lspitem.completion_item.documentation) {
+      return getLspContents(lspitem.completion_item, filetype);
+    } else {
+      await denops.call("popup_preview#vimlsp#resolve", lspitem);
+      return { close: false };
+    }
   }
 
   // nvim-lsp + ddc

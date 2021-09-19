@@ -7,8 +7,8 @@ local is_new_handler = function(arg)
   return vim.fn.has('nvim-0.6') and type(arg) == 'table'
 end
 
-local respond = function(type, item)
-  api.nvim_call_function('denops#notify', {'popup_preview', 'respond', {type, item}})
+local respond = function(item)
+  api.nvim_call_function('denops#notify', {'popup_preview', 'respond', {item}})
 end
 
 local get_resolved_item = function(arg)
