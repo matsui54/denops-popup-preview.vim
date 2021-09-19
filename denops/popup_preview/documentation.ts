@@ -7,7 +7,7 @@ import {
 } from "./types.ts";
 import { DocConfig } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
-import { applyMarkdownSyntax, getHighlights } from "./markdown.ts";
+import { getHighlights, getStylizeCommands,makeFloatingwinSize } from "./markdown.ts";
 
 export class DocHandler {
   private async showFloating(
@@ -36,31 +36,26 @@ export class DocHandler {
       col: col + 1,
       border: config.border,
     };
-    const fences = await vars.g.get(
-      denops,
-      "markdown_fenced_languages",
-      [],
-    ) as string[];
-    const [stripped, highlights, width, height] = getHighlights(lines, {
-      maxWidth: maxWidth,
-      maxHeight: maxHeight,
-      separator: "",
-      fences: fences,
-    });
-    // const bufnr = await denops.call("popup_preview#doc#set_buffer", {
-    //   lines: stripped,
-    // }) as number;
-    // const winid = await denops.call(
-    //   "popup_preview#doc#get_winid",
-    // ) as number;
-    let cmds: string[] = [];
+    let cmds: string[] = [], stripped: string[];
+    let width: number, height: number;
     if (syntax == "markdown") {
-      cmds = applyMarkdownSyntax(denops, -1, stripped, highlights, {
+      const hiCtx = await getStylizeCommands(denops, lines, {
         maxWidth: maxWidth,
         maxHeight: maxHeight,
         separator: "",
-        fences: fences,
+        fences: await vars.g.get(
+          denops,
+          "markdown_fenced_languages",
+          [],
+        ) as string[],
       });
+      stripped = hiCtx.stripped;
+      width = hiCtx.width;
+      height = hiCtx.height;
+      cmds = hiCtx.commands;
+    } else {
+      stripped = lines;
+      [width, height] = await makeFloatingwinSize(denops, lines, maxWidth, maxHeight);
     }
     batch(denops, async (denops) => {
       await denops.call(

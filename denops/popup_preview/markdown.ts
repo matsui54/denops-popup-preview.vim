@@ -1,4 +1,4 @@
-import { batch, Denops, fn, vars } from "./deps.ts";
+import { batch, Denops, fn, gather, vars } from "./deps.ts";
 type MarkedString = string | { language: string; value: string };
 export type MarkupKind = "plaintext" | "markdown";
 export type MarkupContent = {
@@ -46,26 +46,29 @@ export function convertInputToMarkdownLines(
   return contents;
 }
 
-export function makeFloatingwinSize(
+export async function makeFloatingwinSize(
+  denops: Denops,
   lines: string[],
   maxWidth: number,
   maxHeight: number,
-): [number, number] {
-  const width = Math.min(
-    Math.max(...lines.map((line) => line.length)),
-    maxWidth,
-  );
+): Promise<[number, number]> {
+  const widths = await gather(denops, async (denops) => {
+    for (const line of lines) {
+      await fn.strdisplaywidth(denops, line);
+    }
+  }) as number[];
+  const width = Math.min(Math.max(...widths), maxWidth);
 
   let height = 0;
-  for (const w of lines) {
-    height += Math.floor((w.length ? w.length - 1 : 0) / width) + 1;
+  for (const w of widths) {
+    height += Math.floor((w ? w - 1 : 0) / width) + 1;
   }
   height = Math.min(maxHeight, height);
   return [width, height];
 }
 
 export function getMarkdownFences(items: string[]) {
-  let fences: Record<string, string> = {};
+  const fences: Record<string, string> = {};
   for (const item of items) {
     const maybe = item.split("=");
     if (maybe.length == 2) {
@@ -75,10 +78,42 @@ export function getMarkdownFences(items: string[]) {
   return fences;
 }
 
-export function getHighlights(
+type Matcher = {
+  ft: string;
+  begin: string;
+  end: string;
+};
+
+type Match = {
+  ft: string | null;
+  type: string;
+};
+
+type Highlight = {
+  ft: string | null;
+  start: number;
+  finish: number;
+};
+
+type HighlightContent = {
+  stripped: string[];
+  highlights: Highlight[];
+  width: number;
+  height: number;
+};
+
+type HighlightContext = {
+  stripped: string[];
+  commands: string[];
+  width: number;
+  height: number;
+};
+
+export async function getHighlights(
+  denops: Denops,
   contents: string[],
   opts: FloatOption,
-): [string[], Highlight[], number, number] {
+): Promise<HighlightContent> {
   const matchers: Record<string, Matcher> = {
     block: { ft: "", begin: "```+([a-zA-Z0-9_]*)", end: "```+" }, // block
     pre: { ft: "", begin: "<pre>", end: "<\/pre>" }, // pre
@@ -104,9 +139,9 @@ export function getHighlights(
     return line.search(matchers[match.type].end) != -1;
   }
 
-  let stripped: string[] = [];
-  let highlights: Highlight[] = [];
-  let markdownLines: boolean[] = [];
+  const stripped: string[] = [];
+  const highlights: Highlight[] = [];
+  const markdownLines: boolean[] = [];
   for (let i = 0; i < contents.length;) {
     const line = contents[i];
     const match = matchBegin(line);
@@ -156,7 +191,8 @@ export function getHighlights(
     }
   }
 
-  const [width, height] = makeFloatingwinSize(
+  const [width, height] = await makeFloatingwinSize(
+    denops,
     stripped,
     opts.maxWidth,
     opts.maxHeight,
@@ -168,21 +204,13 @@ export function getHighlights(
       stripped[i] = sepLine;
     }
   }
-  return [stripped, highlights, width, height];
+  return {
+    stripped: stripped,
+    highlights: highlights,
+    width: width,
+    height: height,
+  };
 }
-
-export type stylizeOptions = {
-  height: number;
-  width: number;
-  wrap_at: string;
-  max_width: number;
-  max_height: number;
-  pad_left: number;
-  pad_right: number;
-  pad_top: number;
-  pad_bottom: number;
-  separator: string;
-};
 
 // --- Converts markdown into syntax highlighted regions by stripping the code
 // --- blocks and converting them into highlighted code.
@@ -206,23 +234,6 @@ export type stylizeOptions = {
 // ---  - pad_bottom number of lines to pad contents at bottom
 // ---  - separator insert separator after code block
 // ---@returns width,height size of float
-type Matcher = {
-  ft: string;
-  begin: string;
-  end: string;
-};
-
-type Match = {
-  ft: string | null;
-  type: string;
-};
-
-type Highlight = {
-  ft: string | null;
-  start: number;
-  finish: number;
-};
-
 type FloatOption = {
   maxWidth: number;
   maxHeight: number;
@@ -230,19 +241,18 @@ type FloatOption = {
   fences: string[];
 };
 
-export function applyMarkdownSyntax(
+export async function getStylizeCommands(
   denops: Denops,
-  winid: number,
-  contents: string[],
-  highlights: Highlight[],
+  lines: string[],
   opts: FloatOption,
-): string[] {
+): Promise<HighlightContext> {
+  const hiContents = await getHighlights(denops, lines, opts);
   const fences = getMarkdownFences(
     opts.fences,
   );
-  let cmds: string[] = [];
+  const cmds: string[] = [];
   let index = 0;
-  let langs: Record<string, boolean> = {};
+  const langs: Record<string, boolean> = {};
   function applySyntax(
     ft: string | null,
     start: number,
@@ -273,15 +283,20 @@ export function applyMarkdownSyntax(
   cmds.push("syntax clear");
 
   let last = 1;
-  for (const hi of highlights) {
+  for (const hi of hiContents.highlights) {
     if (last < hi.start) {
       applySyntax("popup_preview_markdown", last, hi.start - 1);
     }
     applySyntax(hi.ft, hi.start, hi.finish);
     last = hi.finish + 1;
   }
-  if (last < contents.length) {
-    applySyntax("popup_preview_markdown", last, contents.length);
+  if (last < hiContents.stripped.length) {
+    applySyntax("popup_preview_markdown", last, hiContents.stripped.length);
   }
-  return cmds;
+  return {
+    stripped: hiContents.stripped,
+    commands: cmds,
+    width: hiContents.width,
+    height: hiContents.height,
+  };
 }
