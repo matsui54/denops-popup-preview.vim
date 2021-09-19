@@ -10,11 +10,11 @@ syn clear markdownEscape
 syntax region markdownEscape matchgroup=markdownEscape start=/\\\ze[\\\x60*{}\[\]()#+\-,.!_>~|"$%&'\/:;<=?@^ ]/ end=/./ containedin=ALL keepend oneline concealends
 
 " conceal html entities
-syntax match vital_vs_vim_syntax_markdown_entities_lt /&lt;/ containedin=ALL conceal cchar=<
-syntax match vital_vs_vim_syntax_markdown_entities_gt /&gt;/ containedin=ALL conceal cchar=>
-syntax match vital_vs_vim_syntax_markdown_entities_amp /&amp;/ containedin=ALL conceal cchar=&
-syntax match vital_vs_vim_syntax_markdown_entities_quot /&quot;/ containedin=ALL conceal cchar="
-syntax match vital_vs_vim_syntax_markdown_entities_nbsp /&nbsp;/ containedin=ALL conceal cchar= 
+syntax match mkdNbsp /&nbsp;/ conceal cchar= 
+syntax match mkdLt /&lt;/  conceal cchar=<
+syntax match mkdGt /&gt;/  conceal cchar=>
+syntax match mkdAmp /&amp;/  conceal cchar=&
+syntax match mkdQuot /&quot;/  conceal cchar="
 
 hi def link mkdEscape special
 
