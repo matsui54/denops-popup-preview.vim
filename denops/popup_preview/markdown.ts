@@ -127,10 +127,31 @@ export function getHighlights(
         start: start + 1,
         finish: stripped.length,
       });
+      // add separator
+      if (i < contents.length) {
+        stripped.push("---");
+        markdownLines[stripped.length - 1] = true;
+      }
     } else {
-      // if (line.search(/^---+$/) !=-1 ){
-      // }
-      stripped.push(line);
+      // strip any emty lines or separators prior to this separator in actual markdown
+      if (/^---+$/.test(line)) {
+        while (
+          markdownLines[stripped.length - 1] &&
+          (/^\s*$/.test(stripped[stripped.length - 1]) ||
+            (/^---+$/.test(stripped[stripped.length - 1])))
+        ) {
+          markdownLines[stripped.length - 1] = false;
+          stripped.pop();
+        }
+      }
+      // add the line if its not an empty line following a separator
+      if (
+        !(/^\s*$/.test(line) && markdownLines[stripped.length - 1] &&
+          /^---+$/.test(stripped[stripped.length - 1]))
+      ) {
+        stripped.push(line);
+        markdownLines[stripped.length - 1] = true;
+      }
       i++;
     }
   }
@@ -140,6 +161,13 @@ export function getHighlights(
     opts.maxWidth,
     opts.maxHeight,
   );
+  const sepLine = "─".repeat(width);
+  // replace --- with line separator
+  for (let i = 0; i < stripped.length; i++) {
+    if (/^---+$/.test(stripped[i]) && markdownLines[i]) {
+      stripped[i] = sepLine;
+    }
+  }
   return [stripped, highlights, width, height];
 }
 
@@ -198,7 +226,7 @@ type Highlight = {
 type FloatOption = {
   maxWidth: number;
   maxHeight: number;
-  separator: string;
+  separator?: string;
   fences: string[];
 };
 
@@ -242,7 +270,7 @@ export function applyMarkdownSyntax(
     );
   }
 
-  cmds.push('syntax clear')
+  cmds.push("syntax clear");
 
   let last = 1;
   for (const hi of highlights) {
