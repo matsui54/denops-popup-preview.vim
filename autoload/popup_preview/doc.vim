@@ -1,6 +1,4 @@
 let s:Buffer = vital#popup_preview#import('VS.Vim.Buffer')
-let s:MarkupContent = vital#popup_preview#import('VS.LSP.MarkupContent')
-let s:Markdown = vital#popup_preview#import('VS.Vim.Syntax.Markdown')
 let s:FloatingWindow = vital#popup_preview#import('VS.Vim.Window.FloatingWindow')
 let s:Window = vital#popup_preview#import('VS.Vim.Window')
 
@@ -57,7 +55,6 @@ function! popup_preview#doc#show_floating(opts) abort
   let win_opts.height = opts.height
 
   call s:win.open(win_opts)
-  " silent call s:Window.do(s:win.get_winid(), { -> s:Markdown.apply() })
   if has_key(opts, 'cmds') && len(opts.cmds)
     call s:Window.do(s:win.get_winid(), { -> execute(join(opts.cmds, "\n"), 'silent') })
   endif
