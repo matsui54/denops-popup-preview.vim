@@ -28,16 +28,6 @@ function! popup_preview#doc#get_winid() abort
   return s:win.get_winid()
 endfunction
 
-function! s:execute_cmds(cmds) abort
-  for cmd in a:cmds
-    execute cmd
-  endfor
-endfunction
-
-function! popup_preview#doc#win_execute(winid, cmds) abort
-  silent call s:Window.do(a:winid, { -> s:execute_cmds(a:cmds) })
-endfunction
-
 " lines: string[]
 function! popup_preview#doc#set_buffer(opts) abort
   call s:ensure_buffer()
@@ -68,8 +58,7 @@ function! popup_preview#doc#show_floating(opts) abort
 
   call s:win.open(win_opts)
   if has_key(opts, 'cmds') && len(opts.cmds)
-    call win_execute(s:win.get_winid(), join(opts.cmds, "\n"), 'silent')
-    " call s:Window.do(s:win.get_winid(), { -> s:execute_cmds(opts.cmds) })
+    call s:Window.do(s:win.get_winid(), { -> execute(join(opts.cmds, "\n"), 'silent') })
   endif
 
   if has('nvim')
