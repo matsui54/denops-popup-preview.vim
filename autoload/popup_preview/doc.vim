@@ -57,6 +57,7 @@ function! popup_preview#doc#show_floating(opts) abort
   let win_opts.height = opts.height
 
   call s:win.open(win_opts)
+  " silent call s:Window.do(s:win.get_winid(), { -> s:Markdown.apply() })
   if has_key(opts, 'cmds') && len(opts.cmds)
     call s:Window.do(s:win.get_winid(), { -> execute(join(opts.cmds, "\n"), 'silent') })
   endif

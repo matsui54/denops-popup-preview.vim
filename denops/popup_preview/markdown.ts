@@ -222,8 +222,8 @@ export function applyMarkdownSyntax(
   ) {
     if (!ft) {
       cmds.push(
-        `syntax region markdownCode start=+\\%${start}l+ end=+\\%${finish +
-          1}l+ keepend extend`,
+        `syntax region markdownCode start=/\\%${start}l/ end=/\\%${finish +
+          1}l/ keepend extend`,
       );
       return;
     }
@@ -232,16 +232,17 @@ export function applyMarkdownSyntax(
     index++;
     const lang = "@" + ft.toUpperCase();
     if (!langs[lang]) {
-      cmds.push("let b:current_syntax=''");
-      cmds.push("unlet b:current_syntax");
+      cmds.push("unlet! b:current_syntax");
       cmds.push(`silent! syntax include ${lang} syntax/${ft}.vim`);
       langs[lang] = true;
     }
     cmds.push(
-      `syntax region ${name} start=+\\%${start}l+ end=+\\%${finish +
-        1}l+ contains=${lang} keepend`,
+      `syntax region ${name} start=/\\%${start}l/ end=/\\%${finish +
+        1}l/ contains=${lang} keepend`,
     );
   }
+
+  cmds.push('syntax clear')
 
   let last = 1;
   for (const hi of highlights) {
@@ -254,6 +255,5 @@ export function applyMarkdownSyntax(
   if (last < contents.length) {
     applySyntax("popup_preview_markdown", last, contents.length);
   }
-  // await denops.call("popup_preview#doc#win_execute", winid, cmds);
   return cmds;
 }

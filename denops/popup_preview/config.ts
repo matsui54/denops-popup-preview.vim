@@ -31,7 +31,7 @@ export function getDefaultDocConfig(): DocConfig {
     supportVsnip: true,
     supportInfo: true,
     supportUltisnips: true,
-    delay: 30,
+    delay: 50,
   };
 }
 

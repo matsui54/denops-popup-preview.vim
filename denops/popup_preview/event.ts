@@ -1,4 +1,4 @@
-import { autocmd, Denops, fn, vars } from "./deps.ts";
+import { autocmd, Denops, vars } from "./deps.ts";
 import { CompletionItem } from "./types.ts";
 import { DocHandler } from "./documentation.ts";
 import { Config, makeConfig } from "./config.ts";
@@ -22,7 +22,7 @@ export class EventHandler {
     clearTimeout(this.docTimer);
     this.docTimer = setTimeout(async () => {
       await this.docHandler.showCompleteDoc(denops, this.config.documentation);
-    }, 50);
+    }, this.config.documentation.delay);
   }
 
   private async getConfig(denops: Denops): Promise<void> {

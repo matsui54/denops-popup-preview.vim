@@ -53,7 +53,7 @@ export class DocHandler {
     // const winid = await denops.call(
     //   "popup_preview#doc#get_winid",
     // ) as number;
-    let cmds:string[] = [];
+    let cmds: string[] = [];
     if (syntax == "markdown") {
       cmds = applyMarkdownSyntax(denops, -1, stripped, highlights, {
         maxWidth: maxWidth,
