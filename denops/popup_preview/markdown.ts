@@ -116,11 +116,6 @@ export async function getHighlights(
   opts: FloatOption,
 ): Promise<HighlightContent> {
   if (opts.syntax != "markdown") {
-    if (!opts.syntax.length || opts.syntax == 'plaintext'){
-      opts.syntax = "plaintex"
-    }
-    contents[0] = "```" + opts.syntax + " " + contents[0];
-    contents[contents.length - 1] = contents[contents.length - 1] + " ```";
     const [width, height] = await makeFloatingwinSize(
       denops,
       contents,

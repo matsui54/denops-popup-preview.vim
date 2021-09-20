@@ -7,9 +7,7 @@ import {
 } from "./types.ts";
 import { Config } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
-import {
-  getHighlights,
-} from "./markdown.ts";
+import { getHighlights } from "./markdown.ts";
 
 export class DocHandler {
   private async showFloating(
@@ -45,7 +43,6 @@ export class DocHandler {
       separator: "",
       syntax: syntax,
     });
-    // cmds = hiCtx.commands;
     await denops.call(
       "popup_preview#doc#show_floating",
       {
@@ -54,6 +51,7 @@ export class DocHandler {
         events: ["InsertLeave", "CursorMovedI"],
         width: hiCtx.width,
         height: hiCtx.height,
+        syntax: syntax,
       },
     ) as number;
   }

@@ -16,6 +16,7 @@ function! s:ensure_buffer() abort
     call setbufvar(s:win.get_bufnr(), '&buftype', 'nofile')
     call setbufvar(s:win.get_bufnr(), '&buflisted', 0)
     call setbufvar(s:win.get_bufnr(), '&swapfile', 0)
+    call setbufvar(s:win.get_bufnr(), '___popup_preview_current_syntax', '')
   endif
 endfunction
 
@@ -36,10 +37,26 @@ function! popup_preview#doc#set_buffer(opts) abort
   return bufnr 
 endfunction
 
+function! s:apply_syntax(opts) abort
+  if a:opts.syntax == b:___popup_preview_current_syntax
+    return
+  endif
+  unlet! b:current_syntax
+  unlet! b:___VS_Vim_Syntax_Markdown
+  syntax clear
+  if a:opts.syntax == 'markdown'
+    call s:Markdown.apply({ 'text': a:opts.lines })
+  else
+    call execute('runtime! syntax/'.a:opts.syntax.'.vim')
+  endif
+  let b:___popup_preview_current_syntax = a:opts.syntax
+endfunction
+
 " floatOpt: FloatOption;
 " events: autocmd.AutocmdEvent[];
 " width: number;
 " height: number;
+" syntax: string
 function! popup_preview#doc#show_floating(opts) abort
   if getcmdwintype() !=# '' || !pumvisible()
     call s:win.close()
@@ -54,7 +71,7 @@ function! popup_preview#doc#show_floating(opts) abort
   let win_opts.height = opts.height
 
   call s:win.open(win_opts)
-  call s:Window.do(s:win.get_winid(), { -> s:Markdown.apply({ 'text': opts.lines }) })
+  call s:Window.do(s:win.get_winid(), { -> s:apply_syntax(opts) })
 
   if has('nvim')
     call s:win.set_var('&winhighlight', 'NormalFloat:DdcNvimLspDocDocument,FloatBorder:DdcNvimLspDocBorder')
