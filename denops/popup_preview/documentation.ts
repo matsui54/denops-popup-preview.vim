@@ -5,16 +5,16 @@ import {
   FloatOption,
   PopupPos,
 } from "./types.ts";
-import { DocConfig } from "./config.ts";
+import { Config } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
-import { getHighlights, getStylizeCommands,makeFloatingwinSize } from "./markdown.ts";
+import { getStylizeCommands, makeFloatingwinSize } from "./markdown.ts";
 
 export class DocHandler {
   private async showFloating(
     denops: Denops,
     lines: string[],
     syntax: string,
-    config: DocConfig,
+    config: Config,
   ) {
     const pumInfo = await denops.call("pum_getpos") as PopupPos;
     if (!pumInfo || !pumInfo.col) {
@@ -55,7 +55,12 @@ export class DocHandler {
       cmds = hiCtx.commands;
     } else {
       stripped = lines;
-      [width, height] = await makeFloatingwinSize(denops, lines, maxWidth, maxHeight);
+      [width, height] = await makeFloatingwinSize(
+        denops,
+        lines,
+        maxWidth,
+        maxHeight,
+      );
     }
     batch(denops, async (denops) => {
       await denops.call(
@@ -70,15 +75,12 @@ export class DocHandler {
           syntax: syntax,
         },
       ) as number;
-      // if (syntax && syntax != "markdown") {
-      //   await fn.setbufvar(denops, bufnr, "&syntax", syntax);
-      // }
     });
   }
 
   async showCompleteDoc(
     denops: Denops,
-    config: DocConfig,
+    config: Config,
   ): Promise<void> {
     if (!config.enable) return;
     const info = await fn.complete_info(denops, [
@@ -102,7 +104,7 @@ export class DocHandler {
     this.showFloating(denops, maybe.lines, maybe.syntax, config);
   }
 
-  async showLspDoc(denops: Denops, item: CompletionItem, config: DocConfig) {
+  async showLspDoc(denops: Denops, item: CompletionItem, config: Config) {
     const maybe = getLspContents(item, await op.filetype.getLocal(denops));
     if ("close" in maybe) return;
     this.showFloating(denops, maybe.lines, maybe.syntax, config);

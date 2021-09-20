@@ -21,11 +21,11 @@ export class EventHandler {
     // debounce
     clearTimeout(this.docTimer);
     this.docTimer = setTimeout(async () => {
-      await this.docHandler.showCompleteDoc(denops, this.config.documentation);
-    }, this.config.documentation.delay);
+      await this.docHandler.showCompleteDoc(denops, this.config);
+    }, this.config.delay);
   }
 
-  private async getConfig(denops: Denops): Promise<void> {
+  async getConfig(denops: Denops): Promise<void> {
     const users = await vars.g.get(
       denops,
       "popup_preview_config",
@@ -46,7 +46,7 @@ export class EventHandler {
     await this.docHandler.showLspDoc(
       denops,
       arg.item,
-      this.config.documentation,
+      this.config,
     );
   }
 }

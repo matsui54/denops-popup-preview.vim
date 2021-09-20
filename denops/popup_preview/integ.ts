@@ -6,7 +6,7 @@ import {
   VimCompleteItem,
   VimLspData,
 } from "./types.ts";
-import { DocConfig } from "./config.ts";
+import { Config } from "./config.ts";
 import { convertInputToMarkdownLines } from "./markdown.ts";
 
 type DocContents = {
@@ -33,7 +33,7 @@ function getUltisnipsSnippets(
 
 function getInfoField(
   item: VimCompleteItem,
-  config: DocConfig,
+  config: Config,
 ): DocContents {
   if (config.supportInfo && item.info && item.info.length) {
     return { syntax: "plaintext", lines: item.info.split("\n") };
@@ -67,7 +67,7 @@ export function getLspContents(
 export async function searchUserdata(
   denops: Denops,
   item: VimCompleteItem,
-  config: DocConfig,
+  config: Config,
 ): Promise<DocContents> {
   if (!item.user_data) {
     return getInfoField(item, config);
