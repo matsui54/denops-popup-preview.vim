@@ -7,7 +7,9 @@ import {
 } from "./types.ts";
 import { Config } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
-import { getStylizeCommands, makeFloatingwinSize } from "./markdown.ts";
+import {
+  getHighlights,
+} from "./markdown.ts";
 
 export class DocHandler {
   private async showFloating(
@@ -36,46 +38,24 @@ export class DocHandler {
       col: col + 1,
       border: config.border,
     };
-    let cmds: string[] = [], stripped: string[];
-    let width: number, height: number;
-    if (syntax == "markdown") {
-      const hiCtx = await getStylizeCommands(denops, lines, {
-        maxWidth: maxWidth,
-        maxHeight: maxHeight,
-        separator: "",
-        fences: await vars.g.get(
-          denops,
-          "markdown_fenced_languages",
-          [],
-        ) as string[],
-      });
-      stripped = hiCtx.stripped;
-      width = hiCtx.width;
-      height = hiCtx.height;
-      cmds = hiCtx.commands;
-    } else {
-      stripped = lines;
-      [width, height] = await makeFloatingwinSize(
-        denops,
-        lines,
-        maxWidth,
-        maxHeight,
-      );
-    }
-    batch(denops, async (denops) => {
-      await denops.call(
-        "popup_preview#doc#show_floating",
-        {
-          lines: stripped,
-          floatOpt: floatingOpt,
-          events: ["InsertLeave", "CursorMovedI"],
-          width: width,
-          height: height,
-          cmds: cmds,
-          syntax: syntax,
-        },
-      ) as number;
+
+    const hiCtx = await getHighlights(denops, lines, {
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      separator: "",
+      syntax: syntax,
     });
+    // cmds = hiCtx.commands;
+    await denops.call(
+      "popup_preview#doc#show_floating",
+      {
+        lines: hiCtx.stripped,
+        floatOpt: floatingOpt,
+        events: ["InsertLeave", "CursorMovedI"],
+        width: hiCtx.width,
+        height: hiCtx.height,
+      },
+    ) as number;
   }
 
   async showCompleteDoc(

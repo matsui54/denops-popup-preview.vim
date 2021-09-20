@@ -46,6 +46,7 @@ export function convertInputToMarkdownLines(
   return contents;
 }
 
+// TODO: check border
 export async function makeFloatingwinSize(
   denops: Denops,
   lines: string[],
@@ -114,12 +115,38 @@ export async function getHighlights(
   contents: string[],
   opts: FloatOption,
 ): Promise<HighlightContent> {
+  if (opts.syntax != "markdown") {
+    if (!opts.syntax.length || opts.syntax == 'plaintext'){
+      opts.syntax = "plaintex"
+    }
+    contents[0] = "```" + opts.syntax + " " + contents[0];
+    contents[contents.length - 1] = contents[contents.length - 1] + " ```";
+    const [width, height] = await makeFloatingwinSize(
+      denops,
+      contents,
+      opts.maxWidth,
+      opts.maxHeight,
+    );
+    return {
+      stripped: contents,
+      width: width,
+      height: height,
+      highlights: [],
+    };
+  }
   const matchers: Record<string, Matcher> = {
     block: { ft: "", begin: "```+([a-zA-Z0-9_]*)", end: "```+" }, // block
     pre: { ft: "", begin: "<pre>", end: "<\/pre>" }, // pre
     code: { ft: "", begin: "<code>", end: "<\/code>" }, // code
     text: { ft: "plaintex", begin: "<text>", end: "<\/text>" }, // text
   };
+  const fences = getMarkdownFences(
+    await vars.g.get(
+      denops,
+      "markdown_fenced_languages",
+      [],
+    ) as string[],
+  );
 
   function matchBegin(line: string): Match | null {
     for (const type of Object.keys(matchers)) {
@@ -147,10 +174,19 @@ export async function getHighlights(
     const match = matchBegin(line);
     if (match) {
       const start = stripped.length;
+      if (match.ft) {
+        match.ft = fences[match.ft] ? fences[match.ft] : match.ft;
+      }
       i++;
+      if (contents[i] && !matchEnd(contents[i], match)) {
+        stripped.push("```" + match.ft + " " + contents[i]);
+        i++;
+      }
       while (i < contents.length) {
         const fencedLine = contents[i];
         if (matchEnd(fencedLine, match)) {
+          stripped[stripped.length - 1] = stripped[stripped.length - 1] +
+            " ```";
           i++;
           break;
         }
@@ -238,65 +274,65 @@ type FloatOption = {
   maxWidth: number;
   maxHeight: number;
   separator?: string;
-  fences: string[];
+  syntax: string;
 };
 
-export async function getStylizeCommands(
-  denops: Denops,
-  lines: string[],
-  opts: FloatOption,
-): Promise<HighlightContext> {
-  const hiContents = await getHighlights(denops, lines, opts);
-  const fences = getMarkdownFences(
-    opts.fences,
-  );
-  const cmds: string[] = [];
-  let index = 0;
-  const langs: Record<string, boolean> = {};
-  function applySyntax(
-    ft: string | null,
-    start: number,
-    finish: number,
-  ) {
-    if (!ft) {
-      cmds.push(
-        `syntax region markdownCode start=/\\%${start}l/ end=/\\%${finish +
-          1}l/ keepend extend`,
-      );
-      return;
-    }
-    ft = fences[ft] ? fences[ft] : ft;
-    const name = ft + index;
-    index++;
-    const lang = "@" + ft.toUpperCase();
-    if (!langs[lang]) {
-      cmds.push("unlet! b:current_syntax");
-      cmds.push(`silent! syntax include ${lang} syntax/${ft}.vim`);
-      langs[lang] = true;
-    }
-    cmds.push(
-      `syntax region ${name} start=/\\%${start}l/ end=/\\%${finish +
-        1}l/ contains=${lang} keepend`,
-    );
-  }
-
-  cmds.push("syntax clear");
-
-  let last = 1;
-  for (const hi of hiContents.highlights) {
-    if (last < hi.start) {
-      applySyntax("popup_preview_markdown", last, hi.start - 1);
-    }
-    applySyntax(hi.ft, hi.start, hi.finish);
-    last = hi.finish + 1;
-  }
-  if (last < hiContents.stripped.length) {
-    applySyntax("popup_preview_markdown", last, hiContents.stripped.length);
-  }
-  return {
-    stripped: hiContents.stripped,
-    commands: cmds,
-    width: hiContents.width,
-    height: hiContents.height,
-  };
-}
+// export async function getStylizeCommands(
+//   denops: Denops,
+//   lines: string[],
+//   opts: FloatOption,
+// ): Promise<HighlightContext> {
+//   const hiContents = await getHighlights(denops, lines, opts);
+//   const fences = getMarkdownFences(
+//     opts.fences,
+//   );
+//   const cmds: string[] = [];
+//   let index = 0;
+//   const langs: Record<string, boolean> = {};
+//   function applySyntax(
+//     ft: string | null,
+//     start: number,
+//     finish: number,
+//   ) {
+//     if (!ft) {
+//       cmds.push(
+//         `syntax region markdownCode start=/\\%${start}l/ end=/\\%${finish +
+//           1}l/ keepend extend`,
+//       );
+//       return;
+//     }
+//     ft = fences[ft] ? fences[ft] : ft;
+//     const name = ft + index;
+//     index++;
+//     const lang = "@" + ft.toUpperCase();
+//     if (!langs[lang]) {
+//       cmds.push("unlet! b:current_syntax");
+//       cmds.push(`silent! syntax include ${lang} syntax/${ft}.vim`);
+//       langs[lang] = true;
+//     }
+//     cmds.push(
+//       `syntax region ${name} start=/\\%${start}l/ end=/\\%${finish +
+//         1}l/ contains=${lang} keepend`,
+//     );
+//   }
+//
+//   cmds.push("syntax clear");
+//
+//   let last = 1;
+//   for (const hi of hiContents.highlights) {
+//     if (last < hi.start) {
+//       applySyntax("popup_preview_markdown", last, hi.start - 1);
+//     }
+//     applySyntax(hi.ft, hi.start, hi.finish);
+//     last = hi.finish + 1;
+//   }
+//   if (last < hiContents.stripped.length) {
+//     applySyntax("popup_preview_markdown", last, hiContents.stripped.length);
+//   }
+//   return {
+//     stripped: hiContents.stripped,
+//     commands: cmds,
+//     width: hiContents.width,
+//     height: hiContents.height,
+//   };
+// }

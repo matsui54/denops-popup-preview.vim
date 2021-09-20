@@ -3,3 +3,4 @@ popup_preview
 
 VS.Vim.Buffer
 VS.Vim.Window.FloatingWindow
+VS.Vim.Syntax.Markdown

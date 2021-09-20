@@ -1,6 +1,7 @@
 let s:Buffer = vital#popup_preview#import('VS.Vim.Buffer')
 let s:FloatingWindow = vital#popup_preview#import('VS.Vim.Window.FloatingWindow')
 let s:Window = vital#popup_preview#import('VS.Vim.Window')
+let s:Markdown = vital#popup_preview#import('VS.Vim.Syntax.Markdown')
 
 let s:win = s:FloatingWindow.new()
 call s:win.set_var('&wrap', 1)
@@ -32,9 +33,6 @@ function! popup_preview#doc#set_buffer(opts) abort
   call setbufline(bufnr, 1, a:opts.lines)
   call setbufvar(bufnr, '&modified', 0)
   call setbufvar(bufnr, '&bufhidden', 'hide')
-  if a:opts.syntax && a:opts.syntax != 'markdown'
-    call setbufvar(bufnr, '&syntax', a:opts.syntax)
-  endif
   return bufnr 
 endfunction
 
@@ -42,8 +40,6 @@ endfunction
 " events: autocmd.AutocmdEvent[];
 " width: number;
 " height: number;
-" cmds: string[]
-" syntax: string
 function! popup_preview#doc#show_floating(opts) abort
   if getcmdwintype() !=# '' || !pumvisible()
     call s:win.close()
@@ -58,9 +54,7 @@ function! popup_preview#doc#show_floating(opts) abort
   let win_opts.height = opts.height
 
   call s:win.open(win_opts)
-  if has_key(opts, 'cmds') && len(opts.cmds)
-    call s:Window.do(s:win.get_winid(), { -> execute(join(opts.cmds, "\n"), 'silent') })
-  endif
+  call s:Window.do(s:win.get_winid(), { -> s:Markdown.apply({ 'text': opts.lines }) })
 
   if has('nvim')
     call s:win.set_var('&winhighlight', 'NormalFloat:DdcNvimLspDocDocument,FloatBorder:DdcNvimLspDocBorder')
