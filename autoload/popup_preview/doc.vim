@@ -26,13 +26,15 @@ function! popup_preview#doc#get_winid() abort
   return s:win.get_winid()
 endfunction
 
-" lines: string[]
 function! popup_preview#doc#set_buffer(opts) abort
   call s:ensure_buffer()
   let bufnr = s:win.get_bufnr()
   call setbufline(bufnr, 1, a:opts.lines)
   call setbufvar(bufnr, '&modified', 0)
   call setbufvar(bufnr, '&bufhidden', 'hide')
+  if a:opts.syntax && a:opts.syntax != 'markdown'
+    call setbufvar(bufnr, '&syntax', a:opts.syntax)
+  endif
   return bufnr 
 endfunction
 
@@ -41,6 +43,7 @@ endfunction
 " width: number;
 " height: number;
 " cmds: string[]
+" syntax: string
 function! popup_preview#doc#show_floating(opts) abort
   if getcmdwintype() !=# '' || !pumvisible()
     call s:win.close()

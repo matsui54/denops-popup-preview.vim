@@ -67,6 +67,7 @@ export class DocHandler {
           width: width,
           height: height,
           cmds: cmds,
+          syntax: syntax,
         },
       ) as number;
       // if (syntax && syntax != "markdown") {
