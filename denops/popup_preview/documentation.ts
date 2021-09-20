@@ -82,7 +82,6 @@ export class DocHandler {
     denops: Denops,
     config: Config,
   ): Promise<void> {
-    if (!config.enable) return;
     const info = await fn.complete_info(denops, [
       "mode",
       "selected",

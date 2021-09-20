@@ -1,0 +1,122 @@
+*denops-popup-preview.txt*		Show completion documentation
+
+Author : matsui54 <haru.matu9168@gmail.com>
+License: MIT license
+
+CONTENTS					*denops-popup-preview-contents*
+
+Introduction		|denops-popup-preview-introduction|
+Usage			|denops-popup-preview-usage|
+Install			|denops-popup-preview-install|
+Interface		|denops-popup-preview-interface|
+  Variables		  |denops-popup-preview-variables|
+  Functions		  |denops-popup-preview-functions|
+  Highlight		  |denops-popup-preview-highlight|
+Options			|denops-popup-preview-options|
+Configuration		|denops-popup-preview-configuration|
+Example			|denops-popup-preview-example|
+
+==============================================================================
+INTRODUCTION					*denops-popup-preview-introduction*
+
+*denops-popup-preview* shows completion documentation. This works in both Vim
+and Neovim with other plugins such as vim-lsp, nvim-lsp, ultisnips and so on.
+
+==============================================================================
+USAGE						*denops-popup-preview-usage*
+
+You need to start manually.
+>
+	call popup_preview#enable()
+>
+
+==============================================================================
+INSTALL						*denops-popup-preview-install*
+
+Use your favorite plugin manager.
+
+==============================================================================
+INTERFACE					*denops-popup-preview-interface*
+
+------------------------------------------------------------------------------
+FUNCTIONS 					*denops-popup-preview-functions*
+
+popup_preview#enable()			*popup_preview#enable()*
+		Enables |denops-popup-preview|.
+
+popup_preview#disable()			*popup_preview#disable()*
+		Disables |denops-popup-preview|.
+
+popup_preview#is_enabled()			*popup_preview#is_enabled()*
+		Returns weather |denops-popup-preview| plugin is enabled.  This
+		function returns 1 if |denops-popup-preview| is enabled, zero
+		otherwise.
+
+------------------------------------------------------------------------------
+HIGHLIGHTS 					*denops-popup-preview-highlights*
+
+These are Neovim only
+
+PopupPreviewDocument			*hi-PopupPreviewDocument*
+		A highlight used for background of floating window.
+		default: links to |hl-NormalFloat|
+
+PopupPreviewBorder			*hi-PopupPreviewBorder*
+		A highlight used for border of floating window.
+		default: links to FloatBorder
+
+==============================================================================
+OPTIONS						*denops-popup-preview-options*
+
+You can customize |denops-popup-preview| with global variable 
+|g:popup_preview_config|. 
+|g:popup_preview_config| is a dictionary which has the following keys.
+
+border					*denops-popup-preview-option-border*
+		Specify border of floating window. This value is passed to
+		|nvim_open_win()|.
+		(default: "single")
+
+maxWidth				*denops-popup-preview-option-maxWidth*
+		Max width of floating window.
+		(default: 80)
+
+maxHeight				*denops-popup-preview-option-maxHeight*
+		Max height of floating window.
+		(default: in documentation 30, in signature 10)
+
+winblend				*denops-popup-preview-option-winblend*
+		'winblend' of the floating window
+		(Only in Neovim)
+		(default: 'winblend')
+
+supportVsnip				*denops-popup-preview-option-supporVsnip*
+		If it is true, vsnip's snippets preview is shown.
+		(default: v:true)
+
+supportUltisnips 		*denops-popup-preview-option-supporUltisnips*
+		If it is true, ultisnips' snippets preview is shown.
+		(default: v:true)
+
+supportInfo				*denops-popup-preview-option-supportInfo*
+		If it is true, preview of "info" field of |complete-items| is
+		enabled.
+		(default: v:true)
+
+delay					*denops-popup-preview-option-delay*
+    		Time in milliseconds to delay the completion documentation
+		popup. If you feel slow, specify large value.
+		Set 0 to disable debouncing.
+		(default: 30)
+
+==============================================================================
+EXAMPLE					*denops-popup-preview-example*
+>
+	let g:popup_preview_config = {
+	      \ 'border': 'double',
+	      \ 'maxWidth': 60,
+	      \ 'maxHeight': 30,
+	      \ }
+>
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:

@@ -1,7 +1,6 @@
 import { Border } from "./types.ts";
 
 export type Config = {
-  enable: boolean;
   border: Border;
   maxWidth: number;
   maxHeight: number;
@@ -14,7 +13,6 @@ export type Config = {
 
 export function getDefaultDocConfig(): Config {
   return {
-    enable: true,
     border: "single",
     maxWidth: 80,
     maxHeight: 30,
