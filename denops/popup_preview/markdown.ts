@@ -46,7 +46,6 @@ export function convertInputToMarkdownLines(
   return contents;
 }
 
-// TODO: check border
 export async function makeFloatingwinSize(
   denops: Denops,
   lines: string[],
