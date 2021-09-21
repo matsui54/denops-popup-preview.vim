@@ -5,7 +5,7 @@ export type VimCompleteItem = {
   menu?: string;
   info?: string;
   kind?: string;
-  user_data?: unknown;
+  "user_data"?: unknown;
 };
 
 export type CompleteInfo = {
@@ -35,10 +35,10 @@ export type VsnipData = {
 
 export type UltisnipsData = {
   ultisnips: {
-    location: string,
-    description: string,
-  }
-}
+    location: string;
+    description: string;
+  };
+};
 
 export type CompletionItem = {
   detail?: string;

@@ -1,5 +1,5 @@
 import { autocmd, batch, Denops, fn, gather, vars } from "./deps.ts";
-import { DocResponce, EventHandler} from "./event.ts";
+import { DocResponce, EventHandler } from "./event.ts";
 
 export async function main(denops: Denops) {
   const handler = new EventHandler();

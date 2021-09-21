@@ -1,5 +1,8 @@
 export type { Denops } from "https://deno.land/x/denops_std@v1.11.2/mod.ts#^";
-export { batch, gather } from "https://deno.land/x/denops_std@v1.11.2/batch/mod.ts#^";
+export {
+  batch,
+  gather,
+} from "https://deno.land/x/denops_std@v1.11.2/batch/mod.ts#^";
 export * as op from "https://deno.land/x/denops_std@v1.11.2/option/mod.ts#^";
 export * as fn from "https://deno.land/x/denops_std@v1.11.2/function/mod.ts#^";
 export * as nvimFn from "https://deno.land/x/denops_std@v1.11.2/function/nvim/mod.ts#^";
