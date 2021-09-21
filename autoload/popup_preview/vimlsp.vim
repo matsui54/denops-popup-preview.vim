@@ -3,7 +3,7 @@ function s:respond(data) abort
     return
   endif
 
-  call denops#notify('popup_preview', 'respond', [{"item": a:data.response.result}])
+  call popup_preview#notify('respond', [{"item": a:data.response.result}])
 endfunction
 function popup_preview#vimlsp#resolve(item) abort
   let item = a:item

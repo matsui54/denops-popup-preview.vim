@@ -34,7 +34,7 @@ export async function main(denops: Denops) {
           helper.define(
             event,
             "*",
-            `call denops#notify('${denops.name}', 'onEvent',["${event}"])`,
+            `call popup_preview#notify('onEvent', ["${event}"])`,
           );
         }
       },

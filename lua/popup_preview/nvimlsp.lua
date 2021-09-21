@@ -8,7 +8,7 @@ local is_new_handler = function(arg)
 end
 
 local respond = function(item)
-  api.nvim_call_function('denops#notify', {'popup_preview', 'respond', {item}})
+  api.nvim_call_function('popup_preview#notify', {'respond', {item}})
 end
 
 local get_resolved_item = function(arg)
