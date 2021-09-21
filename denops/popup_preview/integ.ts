@@ -14,6 +14,11 @@ type DocContents = {
   lines: string[];
 } | { close: boolean };
 
+function stylizeSnippet(lines: string[]): string[] {
+  lines = lines.flatMap((line) => line.split("\n"));
+  return lines.map((line) => line.replace(/\${(\d:)?(\w+)}/g, "$2"));
+}
+
 function getUltisnipsSnippets(
   item: UltisnipsData,
 ): string[] | null {
@@ -28,7 +33,7 @@ function getUltisnipsSnippets(
     text = text.concat(line);
   }
   if (!text.length) return null;
-  return text;
+  return stylizeSnippet(text);
 }
 
 function getInfoField(
@@ -126,7 +131,7 @@ export async function searchUserdata(
 
   // vsnip
   if (config.supportVsnip && "vsnip" in decoded) {
-    return { syntax: filetype, lines: decoded.vsnip.snippet };
+    return { syntax: filetype, lines: stylizeSnippet(decoded.vsnip.snippet) };
   }
 
   // ddc-ultisnips
