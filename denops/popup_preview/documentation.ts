@@ -42,6 +42,7 @@ export class DocHandler {
       maxHeight: maxHeight,
       separator: "",
       syntax: syntax,
+      border: config.border,
     });
     await denops.call(
       "popup_preview#doc#show_floating",

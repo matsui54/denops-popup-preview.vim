@@ -52,7 +52,12 @@ export async function makeFloatingwinSize(
   lines: string[],
   maxWidth: number,
   maxHeight: number,
+  border: boolean,
 ): Promise<[number, number]> {
+  if (border) {
+    maxWidth += 2;
+    maxHeight += 2;
+  }
   const widths = await gather(denops, async (denops) => {
     for (const line of lines) {
       await fn.strdisplaywidth(denops, line);
@@ -108,6 +113,7 @@ type FloatOption = {
   maxHeight: number;
   separator?: string;
   syntax: string;
+  border: boolean;
 };
 
 export async function getHighlights(
@@ -121,6 +127,7 @@ export async function getHighlights(
       contents,
       opts.maxWidth,
       opts.maxHeight,
+      opts.border,
     );
     return {
       stripped: contents,
@@ -229,6 +236,7 @@ export async function getHighlights(
     stripped,
     opts.maxWidth,
     opts.maxHeight,
+    opts.border,
   );
   const sepLine = "─".repeat(width);
   // replace --- with line separator

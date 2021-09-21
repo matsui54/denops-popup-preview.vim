@@ -73,9 +73,8 @@ You can customize |denops-popup-preview| with global variable
 |g:popup_preview_config| is a dictionary which has the following keys.
 
 border					*denops-popup-preview-option-border*
-		Specify border of floating window. This value is passed to
-		|nvim_open_win()|.
-		(default: "single")
+		If it is true, border of floating window is shown.
+		(default: v:true)
 
 maxWidth				*denops-popup-preview-option-maxWidth*
 		Max width of floating window.
@@ -113,7 +112,6 @@ delay					*denops-popup-preview-option-delay*
 EXAMPLE					*denops-popup-preview-example*
 >
 	let g:popup_preview_config = {
-	      \ 'border': 'double',
 	      \ 'maxWidth': 60,
 	      \ 'maxHeight': 30,
 	      \ }

@@ -73,7 +73,7 @@ export type FloatOption = {
   height?: number;
   row?: number;
   col?: number;
-  border?: Border;
+  border?: boolean;
 };
 
 export type OpenFloatOptions = {
