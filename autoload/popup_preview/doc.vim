@@ -85,3 +85,16 @@ function! popup_preview#doc#show_floating(opts) abort
   endif
   return s:win.get_winid()
 endfunction
+
+function! popup_preview#doc#scroll(count) abort
+  let ctx = {}
+  function! ctx.callback(count) abort
+    let info = s:win.info()
+    if info is v:null
+      return
+    endif
+    call s:Window.scroll(s:win.get_winid(), info.topline+a:count)
+  endfunction
+  call timer_start(0, { -> l:ctx.callback(a:count) })
+  return "\<Ignore>"
+endfunction

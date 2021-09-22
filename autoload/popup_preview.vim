@@ -45,3 +45,8 @@ function! popup_preview#notify(method, arg) abort
     call denops#notify('popup_preview', a:method, a:arg)
   endif
 endfunction
+
+function! popup_preview#scroll(count) abort
+  call popup_preview#doc#scroll(a:count)
+  return "\<Ignore>"
+endfunction
