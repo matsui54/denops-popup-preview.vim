@@ -54,8 +54,8 @@ export async function makeFloatingwinSize(
   border: boolean,
 ): Promise<[number, number]> {
   if (border) {
-    maxWidth += 2;
-    maxHeight += 2;
+    maxWidth -= 2;
+    maxHeight -= 2;
   }
   const widths = await gather(denops, async (denops) => {
     for (const line of lines) {
