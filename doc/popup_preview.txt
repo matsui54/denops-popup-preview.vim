@@ -52,6 +52,13 @@ popup_preview#is_enabled()			*popup_preview#is_enabled()*
 		function returns 1 if |denops-popup-preview| is enabled, zero
 		otherwise.
 
+popup_preview#scroll({count})			*popup_preview#scroll()*
+		Scroll floating window with {count}.
+
+		Example: >
+		inoremap <buffer> <expr><c-f> popup_preview#scroll(+4)
+		inoremap <buffer> <expr><c-d> popup_preview#scroll(-4)
+
 ------------------------------------------------------------------------------
 HIGHLIGHTS 					*denops-popup-preview-highlights*
 
