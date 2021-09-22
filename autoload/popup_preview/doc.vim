@@ -75,6 +75,9 @@ function! popup_preview#doc#show_floating(opts) abort
 
   if has('nvim')
     call s:win.set_var('&winhighlight', 'NormalFloat:DdcNvimLspDocDocument,FloatBorder:DdcNvimLspDocBorder')
+    if opts.winblend
+      call s:win.set_var('&winblend', opts.winblend)
+    endif
   endif
   if len(opts.events)
     execute printf("autocmd %s <buffer> ++once call popup_preview#doc#close_floating({})",

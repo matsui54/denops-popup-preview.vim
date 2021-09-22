@@ -53,6 +53,7 @@ export class DocHandler {
         width: hiCtx.width,
         height: hiCtx.height,
         syntax: syntax,
+        winblend: config.winblend,
       },
     ) as number;
   }
