@@ -16,7 +16,9 @@ type DocContents = {
 
 function stylizeSnippet(lines: string[]): string[] {
   lines = lines.flatMap((line) => line.split("\n"));
-  return lines.map((line) => line.replace(/\${(\d:)?(\w+)}/g, "$2"));
+  return lines.map((line) =>
+    line.replace(/\${(\d:)?(\w+)}/g, "$2").replace(/\$(\d)+/g, "$1")
+  );
 }
 
 function getUltisnipsSnippets(
