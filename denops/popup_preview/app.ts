@@ -28,15 +28,24 @@ export async function main(denops: Denops) {
         for (
           const event of [
             "CompleteChanged",
+            "PumCompleteChanged",
             "InsertEnter",
           ] as autocmd.AutocmdEvent[]
         ) {
           helper.define(
-            event,
+            [
+              "CompleteChanged",
+              "InsertEnter",
+            ],
             "*",
             `call popup_preview#notify('onEvent', ["${event}"])`,
           );
         }
+        helper.define(
+          "User",
+          "PumCompleteChanged",
+          "call popup_preview#notify('onEvent', ['PumCompleteChanged'])",
+        );
       },
     );
   }

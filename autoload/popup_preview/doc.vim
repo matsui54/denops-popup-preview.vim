@@ -58,7 +58,7 @@ endfunction
 " height: number;
 " syntax: string
 function! popup_preview#doc#show_floating(opts) abort
-  if getcmdwintype() !=# '' || !pumvisible()
+  if getcmdwintype() !=# '' || !popup_preview#pum#visible()
     call s:win.close()
     return -1
   endif

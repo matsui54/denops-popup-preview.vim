@@ -37,7 +37,7 @@ export class EventHandler {
   async onEvent(denops: Denops, event: autocmd.AutocmdEvent): Promise<void> {
     if (event == "InsertEnter") {
       await this.onInsertEnter(denops);
-    } else if (event == "CompleteChanged") {
+    } else if (["CompleteChanged", "PumCompleteChanged"].includes(event)) {
       this.onCompleteChanged(denops);
     }
   }

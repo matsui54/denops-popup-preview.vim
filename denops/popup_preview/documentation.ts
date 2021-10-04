@@ -16,7 +16,7 @@ export class DocHandler {
     syntax: string,
     config: Config,
   ) {
-    const pumInfo = await denops.call("pum_getpos") as PopupPos;
+    const pumInfo = await denops.call("popup_preview#pum#get_pos") as PopupPos;
     if (!pumInfo || !pumInfo.col) {
       this.closeWin(denops);
       return;
@@ -62,13 +62,9 @@ export class DocHandler {
     denops: Denops,
     config: Config,
   ): Promise<void> {
-    const info = await fn.complete_info(denops, [
-      "mode",
-      "selected",
-      "items",
-    ]) as CompleteInfo;
+    const info = await denops.call("popup_preview#pum#info") as CompleteInfo;
     if (
-      info["mode"] != "eval" ||
+      // info["mode"] != "eval" ||
       info["selected"] == -1
     ) {
       this.closeWin(denops);
