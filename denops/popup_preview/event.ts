@@ -39,6 +39,10 @@ export class EventHandler {
       await this.onInsertEnter(denops);
     } else if (["CompleteChanged", "PumCompleteChanged"].includes(event)) {
       this.onCompleteChanged(denops);
+    } else if (event == "CursorMovedI") {
+      if (!(await denops.call("popup_preview#pum#visible"))) {
+        this.docHandler.closeWin(denops);
+      }
     }
   }
 

@@ -49,7 +49,7 @@ export class DocHandler {
       {
         lines: hiCtx.stripped,
         floatOpt: floatingOpt,
-        events: ["InsertLeave", "CursorMovedI"],
+        events: ["InsertLeave"],
         width: hiCtx.width,
         height: hiCtx.height,
         syntax: syntax,

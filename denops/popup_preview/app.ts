@@ -28,15 +28,12 @@ export async function main(denops: Denops) {
         for (
           const event of [
             "CompleteChanged",
-            "PumCompleteChanged",
             "InsertEnter",
+            "CursorMovedI",
           ] as autocmd.AutocmdEvent[]
         ) {
           helper.define(
-            [
-              "CompleteChanged",
-              "InsertEnter",
-            ],
+            event,
             "*",
             `call popup_preview#notify('onEvent', ["${event}"])`,
           );
