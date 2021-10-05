@@ -29,7 +29,7 @@ export async function main(denops: Denops) {
           const event of [
             "CompleteChanged",
             "InsertEnter",
-            "CursorMovedI",
+            "TextChangedI",
           ] as autocmd.AutocmdEvent[]
         ) {
           helper.define(

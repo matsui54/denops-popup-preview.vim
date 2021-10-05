@@ -34,3 +34,11 @@ function! popup_preview#pum#get_pos() abort
     return pum_getpos()
   endif
 endfunction
+
+function! popup_preview#pum#skip() abort
+  if s:has_pum
+    return pum#skip_complete()
+  else
+    return v:false
+  endif
+endfunction
