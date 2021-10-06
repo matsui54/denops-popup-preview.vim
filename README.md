@@ -1,6 +1,10 @@
 # denops-popup-preview.vim
 Show completion documentation
 
+
+https://user-images.githubusercontent.com/63794197/136235769-02cf8fca-0e67-440e-9986-593ff71666fb.mp4
+
+
 ## features
 - works in both Vim and Neovim
 - support [pum.vim](https://github.com/Shougo/pum.vim)
