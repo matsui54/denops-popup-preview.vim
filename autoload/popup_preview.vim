@@ -14,7 +14,7 @@ function! popup_preview#enable() abort
   if exists('g:loaded_denops') && denops#server#status() ==# 'running'
     silent! call s:register()
   else
-    autocmd PopupPreview User DenopsReady silent! call s:register()
+    autocmd PopupPreview User DenopsReady ++once silent! call s:register()
   endif
 endfunction
 
