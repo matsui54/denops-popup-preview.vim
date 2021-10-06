@@ -22,14 +22,7 @@ endfunction
 
 function! popup_preview#pum#get_pos() abort
   if s:has_pum && pum#visible()
-    let pum = pum#_get()
-    return {
-          \ 'height': pum.height,
-          \ 'width': pum.width,
-          \ 'row': pum.pos[0],
-          \ 'col': pum.pos[1],
-          \ 'scrollbar': v:false,
-          \ }
+    return pum#get_pos()
   else
     return pum_getpos()
   endif
