@@ -89,7 +89,7 @@ maxWidth				*denops-popup-preview-option-maxWidth*
 
 maxHeight				*denops-popup-preview-option-maxHeight*
 		Max height of floating window.
-		(default: in documentation 30, in signature 10)
+		(default: 30)
 
 winblend				*denops-popup-preview-option-winblend*
 		'winblend' of the floating window
