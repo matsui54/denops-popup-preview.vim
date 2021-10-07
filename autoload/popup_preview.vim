@@ -37,7 +37,7 @@ endfunction
 function! s:denops_running() abort
   return exists('g:loaded_denops')
         \ && denops#server#status() ==# 'running'
-        \ && denops#plugin#is_loaded('ddc')
+        \ && denops#plugin#is_loaded('popup_preview')
 endfunction
 
 function! popup_preview#notify(method, arg) abort
