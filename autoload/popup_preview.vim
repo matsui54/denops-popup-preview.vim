@@ -2,7 +2,7 @@ let s:root_dir = fnamemodify(expand('<sfile>'), ':h:h')
 let s:is_enabled = 0
 
 function! popup_preview#enable() abort
-  if denops#plugin#is_loaded('ddc_nvim_lsp_doc')
+  if denops#plugin#is_loaded('popup_preview')
     return
   endif
   let s:is_enabled = 1

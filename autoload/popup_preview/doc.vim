@@ -74,7 +74,7 @@ function! popup_preview#doc#show_floating(opts) abort
   call s:Window.do(s:win.get_winid(), { -> s:apply_syntax(opts) })
 
   if has('nvim')
-    call s:win.set_var('&winhighlight', 'NormalFloat:DdcNvimLspDocDocument,FloatBorder:DdcNvimLspDocBorder')
+    call s:win.set_var('&winhighlight', 'NormalFloat:PopupPreviewDocument,FloatBorder:PopupPreviewBorder')
     if opts.winblend
       call s:win.set_var('&winblend', opts.winblend)
     endif
