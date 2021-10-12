@@ -27,7 +27,8 @@ endfunction
 
 function! s:register() abort
   call denops#plugin#register('popup_preview',
-        \ denops#util#join_path(s:root_dir, 'denops', 'popup_preview', 'app.ts'))
+        \ denops#util#join_path(s:root_dir, 'denops', 'popup_preview', 'app.ts'),
+        \ { 'mode': 'reload' })
 endfunction
 
 function! popup_preview#is_enabled() abort
