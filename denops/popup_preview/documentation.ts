@@ -7,7 +7,7 @@ import {
 } from "./types.ts";
 import { Config } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
-import { getHighlights } from "./markdown.ts";
+import { getHighlights, makeFloatingwinSize } from "./markdown.ts";
 
 export class DocHandler {
   private async showFloating(
@@ -22,21 +22,36 @@ export class DocHandler {
       return;
     }
 
-    const col = pumInfo.col + pumInfo.width + (pumInfo.scrollbar ? 1 : 0);
-    const maxWidth = Math.min(
-      await op.columns.get(denops) - col,
-      config.maxWidth,
-    );
+    const displayWidth = await op.columns.get(denops);
+    const rightCol = pumInfo.col + pumInfo.width + (pumInfo.scrollbar ? 1 : 0);
+    const leftCol = pumInfo.col;
+
     const maxHeight = Math.min(
       await denops.eval("&lines") as number - pumInfo.row,
       config.maxHeight,
     );
-    const floatingOpt: FloatOption = {
-      row: pumInfo.row + 1,
-      col: col + 1,
-      border: config.border,
-    };
-
+    const [width, _height] = await makeFloatingwinSize(
+      denops,
+      lines,
+      config.maxWidth,
+      maxHeight,
+      config.border,
+    );
+    let maxWidth: number;
+    let align: "right" | "left";
+    if (
+      displayWidth - rightCol < width && displayWidth - rightCol < leftCol
+    ) {
+      maxWidth = leftCol;
+      align = "left";
+    } else {
+      // right align
+      maxWidth = Math.min(
+        displayWidth - rightCol,
+        config.maxWidth,
+      );
+      align = "right";
+    }
     const hiCtx = await getHighlights(denops, lines, {
       maxWidth: maxWidth,
       maxHeight: maxHeight,
@@ -44,6 +59,14 @@ export class DocHandler {
       syntax: syntax,
       border: config.border,
     });
+    const floatingOpt: FloatOption = {
+      row: pumInfo.row + 1,
+      col: align == "right"
+        ? rightCol + 1
+        : leftCol - hiCtx.width - (config.border ? 2 : 0),
+      border: config.border,
+    };
+
     await denops.call(
       "popup_preview#doc#show_floating",
       {
