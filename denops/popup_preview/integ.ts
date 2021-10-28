@@ -75,6 +75,7 @@ export async function searchUserdata(
   denops: Denops,
   item: VimCompleteItem,
   config: Config,
+  selected: number,
 ): Promise<DocContents> {
   if (!item.user_data) {
     return getInfoField(item, config);
@@ -125,7 +126,7 @@ export async function searchUserdata(
       denops.call(
         "luaeval",
         "require('popup_preview.nvimlsp').get_resolved_item(_A.arg)",
-        { arg: { decoded: decoded.lspitem } },
+        { arg: { decoded: decoded.lspitem, selected: selected } },
       );
       return { close: false };
     }
