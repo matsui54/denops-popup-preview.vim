@@ -104,7 +104,10 @@ export class DocHandler {
 
   async showLspDoc(denops: Denops, item: CompletionItem, config: Config) {
     const maybe = getLspContents(item, await op.filetype.getLocal(denops));
-    if ("close" in maybe) return;
+    if ("close" in maybe) {
+      this.closeWin(denops);
+      return;
+    }
     this.showFloating(denops, maybe.lines, maybe.syntax, config);
   }
 

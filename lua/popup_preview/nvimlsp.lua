@@ -16,8 +16,10 @@ local get_resolved_item = function(arg)
   -- ignore E5018: Some language server make boolean a key of CompletionItem
   pcall(vim.lsp.buf_request, 0, 'completionItem/resolve', item, function(_, arg1, arg2)
     local res = is_new_handler(arg1) and arg1 or arg2
-    if res then
+    if res and not vim.tbl_isempty(res) then
       respond({item = res, selected = arg.selected})
+    else
+      api.nvim_call_function("popup_preview#doc#close_floating", {})
     end
   end)
 end
