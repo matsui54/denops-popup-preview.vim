@@ -47,9 +47,9 @@ export class EventHandler {
   }
 
   async onDocResponce(denops: Denops, arg: DocResponce) {
-    await this.docHandler.showLspDoc(
+    await this.docHandler.onResponce(
       denops,
-      arg.item,
+      arg,
       this.config,
     );
   }

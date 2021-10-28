@@ -8,6 +8,7 @@ import {
 import { Config } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
 import { getHighlights, makeFloatingwinSize } from "./markdown.ts";
+import { DocResponce } from "./event.ts";
 
 export class DocHandler {
   private async showFloating(
@@ -94,7 +95,7 @@ export class DocHandler {
       return;
     }
     const item = info["items"][info["selected"]];
-    const maybe = await searchUserdata(denops, item, config);
+    const maybe = await searchUserdata(denops, item, config, info.selected);
     if ("close" in maybe) {
       if (maybe.close) this.closeWin(denops);
       return;
@@ -102,8 +103,11 @@ export class DocHandler {
     this.showFloating(denops, maybe.lines, maybe.syntax, config);
   }
 
-  async showLspDoc(denops: Denops, item: CompletionItem, config: Config) {
-    const maybe = getLspContents(item, await op.filetype.getLocal(denops));
+  async onResponce(denops: Denops, res: DocResponce, config: Config) {
+    const info = await denops.call("popup_preview#pum#info") as CompleteInfo;
+    if (info.selected != res.selected) return;
+
+    const maybe = getLspContents(res.item, await op.filetype.getLocal(denops));
     if ("close" in maybe) return;
     this.showFloating(denops, maybe.lines, maybe.syntax, config);
   }
