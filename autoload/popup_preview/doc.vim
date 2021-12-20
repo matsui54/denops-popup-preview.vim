@@ -38,12 +38,13 @@ function! popup_preview#doc#set_buffer(opts) abort
 endfunction
 
 function! s:apply_syntax(opts) abort
-  if a:opts.syntax == b:___popup_preview_current_syntax
+  if a:opts.syntax != b:___popup_preview_current_syntax
+    unlet! b:current_syntax
+    unlet! b:___VS_Vim_Syntax_Markdown
+    syntax clear
+  elseif a:opts.syntax != 'markdown'
     return
   endif
-  unlet! b:current_syntax
-  unlet! b:___VS_Vim_Syntax_Markdown
-  syntax clear
   if a:opts.syntax == 'markdown'
     call s:Markdown.apply({ 'text': a:opts.lines })
   else
