@@ -113,7 +113,10 @@ export async function searchUserdata(
     if (lspitem.completion_item.documentation) {
       return getLspContents(lspitem.completion_item, filetype);
     } else {
-      await denops.call("popup_preview#vimlsp#resolve", lspitem);
+      await denops.call("popup_preview#vimlsp#resolve", {
+        item: lspitem,
+        selected: selected,
+      });
       return { close: false };
     }
   }
