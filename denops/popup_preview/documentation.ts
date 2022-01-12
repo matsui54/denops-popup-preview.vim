@@ -53,6 +53,11 @@ export class DocHandler {
       );
       align = "right";
     }
+    if (maxWidth < 1) {
+      this.closeWin(denops);
+      return;
+    }
+
     const hiCtx = await getHighlights(denops, lines, {
       maxWidth: maxWidth,
       maxHeight: maxHeight,
