@@ -9,7 +9,6 @@ Introduction		|denops-popup-preview-introduction|
 Usage			|denops-popup-preview-usage|
 Install			|denops-popup-preview-install|
 Interface		|denops-popup-preview-interface|
-  Variables		  |denops-popup-preview-variables|
   Functions		  |denops-popup-preview-functions|
   Highlight		  |denops-popup-preview-highlight|
 Options			|denops-popup-preview-options|
@@ -64,11 +63,11 @@ HIGHLIGHTS 					*denops-popup-preview-highlights*
 
 These are Neovim only
 
-PopupPreviewDocument			*hi-PopupPreviewDocument*
+PopupPreviewDocument			*hl-PopupPreviewDocument*
 		A highlight used for background of floating window.
 		default: links to |hl-NormalFloat|
 
-PopupPreviewBorder			*hi-PopupPreviewBorder*
+PopupPreviewBorder			*hl-PopupPreviewBorder*
 		A highlight used for border of floating window.
 		default: links to FloatBorder
 
@@ -76,7 +75,7 @@ PopupPreviewBorder			*hi-PopupPreviewBorder*
 OPTIONS						*denops-popup-preview-options*
 
 You can customize |denops-popup-preview| with global variable 
-|g:popup_preview_config|. 
+*g:popup_preview_config* .
 |g:popup_preview_config| is a dictionary which has the following keys.
 
 border					*denops-popup-preview-option-border*
