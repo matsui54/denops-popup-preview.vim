@@ -43,6 +43,8 @@ export class EventHandler {
       if (!(await denops.call("popup_preview#pum#skip"))) {
         this.docHandler.closeWin(denops);
       }
+    } else if (event == "CompleteDone") {
+      this.docHandler.closeWin(denops);
     }
   }
 

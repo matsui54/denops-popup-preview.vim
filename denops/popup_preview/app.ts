@@ -34,6 +34,7 @@ export async function main(denops: Denops) {
             "CompleteChanged",
             "InsertEnter",
             "TextChangedI",
+            "CompleteDone",
           ] as autocmd.AutocmdEvent[]
         ) {
           helper.define(
@@ -46,6 +47,11 @@ export async function main(denops: Denops) {
           "User",
           "PumCompleteChanged",
           "call popup_preview#notify('onEvent', ['PumCompleteChanged'])",
+        );
+        helper.define(
+          "User",
+          "PumCompleteDone",
+          "call popup_preview#notify('onEvent', ['CompleteDone'])",
         );
       },
     );
