@@ -73,6 +73,10 @@ export class DocHandler {
       border: config.border,
     };
 
+    if (hiCtx.width < 1) {
+      this.closeWin(denops);
+      return;
+    }
     await denops.call(
       "popup_preview#doc#show_floating",
       {
