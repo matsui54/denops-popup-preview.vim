@@ -8,6 +8,6 @@ export * as fn from "https://deno.land/x/denops_std@v1.11.3/function/mod.ts#^";
 export * as nvimFn from "https://deno.land/x/denops_std@v1.11.3/function/nvim/mod.ts#^";
 export * as vars from "https://deno.land/x/denops_std@v1.11.3/variable/mod.ts#^";
 export * as autocmd from "https://deno.land/x/denops_std@v1.11.3/autocmd/mod.ts#^";
-export { assertEquals } from "https://deno.land/std@0.121.0/testing/asserts.ts#^";
-export * as log from "https://deno.land/std@0.121.0/log/mod.ts#^";
+export { assertEquals } from "https://deno.land/std@0.123.0/testing/asserts.ts#^";
+export * as log from "https://deno.land/std@0.123.0/log/mod.ts#^";
 export { isLike } from "https://deno.land/x/unknownutil@v1.1.4/mod.ts#^";
