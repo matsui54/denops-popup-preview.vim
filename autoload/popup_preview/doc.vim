@@ -21,7 +21,12 @@ function! s:ensure_buffer() abort
 endfunction
 
 function! popup_preview#doc#close_floating(opts) abort
-  call s:win.close()
+  try
+    call s:win.close()
+  catch /E523:\|E5555:/
+    " Ignore "Not allowed here"
+    return -1
+  endtry
 endfunction
 
 function! popup_preview#doc#get_winid() abort
@@ -64,26 +69,30 @@ function! popup_preview#doc#show_floating(opts) abort
     return -1
   endif
   let opts = a:opts
-  " call s:ensure_buffer()
-  call popup_preview#doc#set_buffer(opts)
-
   let win_opts = opts.floatOpt
   let win_opts.width = opts.width
   let win_opts.height = opts.height
 
-  call s:win.open(win_opts)
-  call s:Window.do(s:win.get_winid(), { -> s:apply_syntax(opts) })
+  try
+    call popup_preview#doc#set_buffer(opts)
 
-  if has('nvim')
-    call s:win.set_var('&winhighlight', 'NormalFloat:PopupPreviewDocument,FloatBorder:PopupPreviewBorder')
-    if opts.winblend
-      call s:win.set_var('&winblend', opts.winblend)
+    call s:win.open(win_opts)
+    call s:Window.do(s:win.get_winid(), { -> s:apply_syntax(opts) })
+
+    if has('nvim')
+      call s:win.set_var('&winhighlight', 'NormalFloat:PopupPreviewDocument,FloatBorder:PopupPreviewBorder')
+      if opts.winblend
+        call s:win.set_var('&winblend', opts.winblend)
+      endif
     endif
-  endif
-  if len(opts.events)
-    execute printf("autocmd %s <buffer> ++once call popup_preview#doc#close_floating({})",
-          \ join(opts.events, ','))
-  endif
+    if len(opts.events)
+      execute printf("autocmd %s <buffer> ++once call popup_preview#doc#close_floating({})",
+            \ join(opts.events, ','))
+    endif
+  catch /E523:/
+    " Ignore "Not allowed here"
+    return -1
+  endtry
   return s:win.get_winid()
 endfunction
 

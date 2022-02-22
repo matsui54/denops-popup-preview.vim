@@ -1,4 +1,4 @@
-import { autocmd, Denops, vars } from "./deps.ts";
+import { Denops, vars } from "./deps.ts";
 import { CompletionItem } from "./types.ts";
 import { DocHandler } from "./documentation.ts";
 import { Config, makeConfig } from "./config.ts";
@@ -13,18 +13,6 @@ export class EventHandler {
   private docHandler = new DocHandler();
   private docTimer = 0;
 
-  private async onInsertEnter(denops: Denops): Promise<void> {
-    await this.getConfig(denops);
-  }
-
-  private onCompleteChanged(denops: Denops): void {
-    // debounce
-    clearTimeout(this.docTimer);
-    this.docTimer = setTimeout(async () => {
-      await this.docHandler.showCompleteDoc(denops, this.config);
-    }, this.config.delay);
-  }
-
   async getConfig(denops: Denops): Promise<void> {
     const users = await vars.g.get(
       denops,
@@ -34,18 +22,16 @@ export class EventHandler {
     this.config = makeConfig(users);
   }
 
-  async onEvent(denops: Denops, event: autocmd.AutocmdEvent): Promise<void> {
-    if (event == "InsertEnter") {
-      await this.onInsertEnter(denops);
-    } else if (["CompleteChanged", "PumCompleteChanged"].includes(event)) {
-      this.onCompleteChanged(denops);
-    } else if (event == "TextChangedI") {
-      if (!(await denops.call("popup_preview#pum#skip"))) {
-        this.docHandler.closeWin(denops);
-      }
-    } else if (event == "CompleteDone") {
-      this.docHandler.closeWin(denops);
-    }
+  async onInsertEnter(denops: Denops): Promise<void> {
+    await this.getConfig(denops);
+  }
+
+  async onCompleteChanged(denops: Denops): Promise<void> {
+    // debounce
+    clearTimeout(this.docTimer);
+    this.docTimer = setTimeout(async () => {
+      await this.docHandler.showCompleteDoc(denops, this.config);
+    }, this.config.delay);
   }
 
   async onDocResponce(denops: Denops, arg: DocResponce) {
