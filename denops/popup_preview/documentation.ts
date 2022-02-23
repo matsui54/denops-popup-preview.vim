@@ -2,7 +2,7 @@ import { Denops, op } from "./deps.ts";
 import { CompleteInfo, FloatOption, PopupPos } from "./types.ts";
 import { Config } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
-import { getHighlights, makeFloatingwinSize } from "./markdown.ts";
+import { getStylizeCommands, makeFloatingwinSize } from "./markdown.ts";
 import { DocResponce } from "./event.ts";
 
 export class DocHandler {
@@ -53,7 +53,7 @@ export class DocHandler {
       return;
     }
 
-    const hiCtx = await getHighlights(denops, lines, {
+    const hiCtx = await getStylizeCommands(denops, lines, {
       maxWidth: maxWidth,
       maxHeight: maxHeight,
       separator: "",
@@ -81,6 +81,7 @@ export class DocHandler {
         width: hiCtx.width,
         height: hiCtx.height,
         syntax: syntax,
+        cmds: hiCtx.commands,
         winblend: config.winblend,
       },
     ) as number;

@@ -107,6 +107,13 @@ type HighlightContent = {
   height: number;
 };
 
+type HighlightContext = {
+  stripped: string[];
+  commands: string[];
+  width: number;
+  height: number;
+};
+
 type FloatOption = {
   maxWidth: number;
   maxHeight: number;
@@ -179,17 +186,17 @@ export async function getHighlights(
         match.ft = fences[match.ft] ? fences[match.ft] : match.ft;
       }
       i++;
-      if (contents[i] && !matchEnd(contents[i], match)) {
+      // if (contents[i] && !matchEnd(contents[i], match)) {
         // stripped.push("---");
         // markdownLines[stripped.length - 1] = true;
-        stripped.push("```" + match.ft + " " + contents[i]);
-        i++;
-      }
+      //   stripped.push("```" + match.ft + " " + contents[i]);
+      //   i++;
+      // }
       while (i < contents.length) {
         const fencedLine = contents[i];
         if (matchEnd(fencedLine, match)) {
-          stripped[stripped.length - 1] = stripped[stripped.length - 1] +
-            " ```";
+          // stripped[stripped.length - 1] = stripped[stripped.length - 1] +
+          //   " ```";
           i++;
           break;
         }
@@ -202,10 +209,10 @@ export async function getHighlights(
         finish: stripped.length,
       });
       // add separator
-      // if (i < contents.length) {
-      //   stripped.push("");
-      //   markdownLines[stripped.length - 1] = true;
-      // }
+      if (i < contents.length) {
+        stripped.push("");
+        markdownLines[stripped.length - 1] = true;
+      }
     } else {
       // strip any emty lines or separators prior to this separator in actual markdown
       if (/^---+$/.test(line)) {
@@ -249,5 +256,73 @@ export async function getHighlights(
     highlights: highlights,
     width: width,
     height: height,
+  };
+}
+
+export async function getStylizeCommands(
+  denops: Denops,
+  lines: string[],
+  opts: FloatOption,
+): Promise<HighlightContext> {
+  const hiContents = await getHighlights(denops, lines, opts);
+  const fences = getMarkdownFences(
+    await vars.g.get(
+      denops,
+      "markdown_fenced_languages",
+      [],
+    ) as string[],
+  );
+  const cmds: string[] = [];
+  let index = 0;
+  const langs: Record<string, boolean> = {};
+  function applySyntax(
+    ft: string | null,
+    start: number,
+    finish: number,
+  ) {
+    if (!ft) {
+      cmds.push(
+        `syntax region markdownCode start=/\\%${start}l/ end=/\\%${
+          finish +
+          1
+        }l/ keepend extend`,
+      );
+      return;
+    }
+    ft = fences[ft] || ft;
+    const name = ft + index;
+    index++;
+    const lang = "@" + ft.toUpperCase();
+    if (!langs[lang]) {
+      cmds.push("unlet! b:current_syntax");
+      cmds.push(`silent! syntax include ${lang} syntax/${ft}.vim`);
+      langs[lang] = true;
+    }
+    cmds.push(
+      `syntax region ${name} start=/\\%${start}l/ end=/\\%${
+        finish +
+        1
+      }l/ contains=${lang} keepend`,
+    );
+  }
+
+  cmds.push("syntax clear");
+
+  let last = 1;
+  for (const hi of hiContents.highlights) {
+    if (last < hi.start) {
+      applySyntax("popup_preview_markdown", last, hi.start - 1);
+    }
+    applySyntax(hi.ft, hi.start, hi.finish);
+    last = hi.finish + 1;
+  }
+  if (last < hiContents.stripped.length) {
+    applySyntax("popup_preview_markdown", last, hiContents.stripped.length);
+  }
+  return {
+    stripped: hiContents.stripped,
+    commands: cmds,
+    width: hiContents.width,
+    height: hiContents.height,
   };
 }

@@ -58,10 +58,11 @@ function! s:apply_syntax(opts) abort
   let b:___popup_preview_current_syntax = a:opts.syntax
 endfunction
 
-" floatOpt: FloatOption;
-" events: autocmd.AutocmdEvent[];
-" width: number;
-" height: number;
+" floatOpt: FloatOption
+" events: autocmd.AutocmdEvent[]
+" width: number
+" cmds: string[]
+" height: number
 " syntax: string
 function! popup_preview#doc#show_floating(opts) abort
   if getcmdwintype() !=# '' || !popup_preview#pum#visible()
@@ -77,7 +78,10 @@ function! popup_preview#doc#show_floating(opts) abort
     call popup_preview#doc#set_buffer(opts)
 
     call s:win.open(win_opts)
-    call s:Window.do(s:win.get_winid(), { -> s:apply_syntax(opts) })
+    " call s:Window.do(s:win.get_winid(), { -> s:apply_syntax(opts) })
+    if has_key(opts, 'cmds') && len(opts.cmds)
+      call s:Window.do(s:win.get_winid(), { -> execute(join(opts.cmds, "\n"), 'silent') })
+    endif
 
     if has('nvim')
       call s:win.set_var('&winhighlight', 'NormalFloat:PopupPreviewDocument,FloatBorder:PopupPreviewBorder')
