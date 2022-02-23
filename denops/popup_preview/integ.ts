@@ -9,21 +9,21 @@ import {
 import { Config } from "./config.ts";
 import { convertInputToMarkdownLines } from "./markdown.ts";
 
-type DocContents = {
-  syntax: string;
-  lines: string[];
-} | { close: boolean };
+type SearchResult = {
+  lines?: string[];
+  found: boolean;
+};
 
-function stylizeSnippet(lines: string[]): string[] {
+function stylizeSnippet(lines: string[]): string {
   lines = lines.flatMap((line) => line.split("\n"));
   return lines.map((line) =>
     line.replace(/\${(\d:)?(\w+)}/g, "$2").replace(/\$(\d)+/g, "$1")
-  );
+  ).join("\n");
 }
 
 function getUltisnipsSnippets(
   item: UltisnipsData,
-): string[] | null {
+): string | null {
   const [filePath, lineNr] = item.ultisnips.location.split(":");
 
   const lines = Deno.readTextFileSync(filePath).split("\n");
@@ -41,17 +41,23 @@ function getUltisnipsSnippets(
 function getInfoField(
   item: VimCompleteItem,
   config: Config,
-): DocContents {
+): SearchResult {
   if (config.supportInfo && item.info && item.info.length) {
-    return { syntax: "plaintext", lines: item.info.split("\n") };
+    return {
+      lines: convertInputToMarkdownLines({
+        kind: "plaintext",
+        value: item.info,
+      }, []),
+      found: true,
+    };
   }
-  return { close: true };
+  return { found: false };
 }
 
 export function getLspContents(
   item: CompletionItem,
   filetype: string,
-): DocContents {
+): SearchResult {
   let lines: string[] = [];
   if (item.detail) {
     lines = convertInputToMarkdownLines({
@@ -66,9 +72,9 @@ export function getLspContents(
   }
 
   if (!lines.length) {
-    return { close: true };
+    return { found: false };
   }
-  return { lines: lines, syntax: "markdown" };
+  return { lines: lines, found: true };
 }
 
 export async function searchUserdata(
@@ -76,7 +82,7 @@ export async function searchUserdata(
   item: VimCompleteItem,
   config: Config,
   selected: number,
-): Promise<DocContents> {
+): Promise<SearchResult> {
   if (!item.user_data) {
     return getInfoField(item, config);
   }
@@ -94,7 +100,13 @@ export async function searchUserdata(
     }
     // plain string
     if (!decoded) {
-      return { syntax: "plaintext", lines: item.user_data.split("\n") };
+      return {
+        lines: convertInputToMarkdownLines({
+          kind: "plaintext",
+          value: item.user_data,
+        }, []),
+        found: true,
+      };
     }
   }
 
@@ -109,7 +121,7 @@ export async function searchUserdata(
       "lsp#omni#get_managed_user_data_from_completed_item",
       item,
     ) as VimLspData;
-    if (!lspitem?.completion_item) return { close: true };
+    if (!lspitem?.completion_item) return { found: false };
     if (lspitem.completion_item.documentation) {
       return getLspContents(lspitem.completion_item, filetype);
     } else {
@@ -117,7 +129,7 @@ export async function searchUserdata(
         item: lspitem,
         selected: selected,
       });
-      return { close: false };
+      return { found: true };
     }
   }
 
@@ -131,20 +143,35 @@ export async function searchUserdata(
         "require('popup_preview.nvimlsp').get_resolved_item(_A.arg)",
         { arg: { decoded: decoded.lspitem, selected: selected } },
       );
-      return { close: false };
+      return { found: true };
     }
   }
 
   // vsnip
   if (config.supportVsnip && "vsnip" in decoded) {
-    return { syntax: filetype, lines: stylizeSnippet(decoded.vsnip.snippet) };
+    return {
+      lines: convertInputToMarkdownLines({
+        language: filetype,
+        value: stylizeSnippet(decoded.vsnip.snippet),
+      }, []),
+      found: true,
+    };
   }
 
   // ddc-ultisnips
   if (config.supportUltisnips && "ultisnips" in decoded) {
     const texts = getUltisnipsSnippets(decoded);
-    if (texts) return { syntax: filetype, lines: texts };
-    else return { close: true };
+    if (texts) {
+      return {
+        lines: convertInputToMarkdownLines({
+          language: filetype,
+          value: texts,
+        }, []),
+        found: true,
+      };
+    } else {
+      return { found: false };
+    }
   }
 
   // unknown object. search for info item

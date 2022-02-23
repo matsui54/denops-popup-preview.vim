@@ -118,7 +118,6 @@ type FloatOption = {
   maxWidth: number;
   maxHeight: number;
   separator?: string;
-  syntax: string;
   border: boolean;
 };
 
@@ -127,21 +126,6 @@ export async function getHighlights(
   contents: string[],
   opts: FloatOption,
 ): Promise<HighlightContent> {
-  if (opts.syntax != "markdown") {
-    const [width, height] = await makeFloatingwinSize(
-      denops,
-      contents,
-      opts.maxWidth,
-      opts.maxHeight,
-      opts.border,
-    );
-    return {
-      stripped: contents,
-      width: width,
-      height: height,
-      highlights: [],
-    };
-  }
   const matchers: Record<string, Matcher> = {
     block: { ft: "", begin: "```+([a-zA-Z0-9_]*)", end: "```+" }, // block
     pre: { ft: "", begin: "<pre>", end: "<\/pre>" }, // pre

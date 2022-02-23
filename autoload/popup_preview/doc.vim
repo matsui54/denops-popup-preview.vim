@@ -41,29 +41,11 @@ function! popup_preview#doc#set_buffer(opts) abort
   call setbufvar(bufnr, '&bufhidden', 'hide')
   return bufnr 
 endfunction
-
-function! s:apply_syntax(opts) abort
-  if a:opts.syntax != b:___popup_preview_current_syntax
-    unlet! b:current_syntax
-    unlet! b:___VS_Vim_Syntax_Markdown
-    syntax clear
-  elseif a:opts.syntax != 'markdown'
-    return
-  endif
-  if a:opts.syntax == 'markdown'
-    call s:Markdown.apply({ 'text': a:opts.lines })
-  else
-    call execute('runtime! syntax/'.a:opts.syntax.'.vim')
-  endif
-  let b:___popup_preview_current_syntax = a:opts.syntax
-endfunction
-
 " floatOpt: FloatOption
 " events: autocmd.AutocmdEvent[]
 " width: number
 " cmds: string[]
 " height: number
-" syntax: string
 function! popup_preview#doc#show_floating(opts) abort
   if getcmdwintype() !=# '' || !popup_preview#pum#visible()
     call s:win.close()
@@ -78,7 +60,6 @@ function! popup_preview#doc#show_floating(opts) abort
     call popup_preview#doc#set_buffer(opts)
 
     call s:win.open(win_opts)
-    " call s:Window.do(s:win.get_winid(), { -> s:apply_syntax(opts) })
     if has_key(opts, 'cmds') && len(opts.cmds)
       call s:Window.do(s:win.get_winid(), { -> execute(join(opts.cmds, "\n"), 'silent') })
     endif

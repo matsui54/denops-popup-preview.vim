@@ -9,7 +9,6 @@ export class DocHandler {
   private async showFloating(
     denops: Denops,
     lines: string[],
-    syntax: string,
     config: Config,
   ) {
     const pumInfo = await denops.call("popup_preview#pum#get_pos") as PopupPos;
@@ -57,7 +56,6 @@ export class DocHandler {
       maxWidth: maxWidth,
       maxHeight: maxHeight,
       separator: "",
-      syntax: syntax,
       border: config.border,
     });
     const floatingOpt: FloatOption = {
@@ -80,7 +78,6 @@ export class DocHandler {
         events: ["InsertLeave"],
         width: hiCtx.width,
         height: hiCtx.height,
-        syntax: syntax,
         cmds: hiCtx.commands,
         winblend: config.winblend,
       },
@@ -101,11 +98,13 @@ export class DocHandler {
     }
     const item = info["items"][info["selected"]];
     const maybe = await searchUserdata(denops, item, config, info.selected);
-    if ("close" in maybe) {
-      if (maybe.close) this.closeWin(denops);
+    if (!maybe.found) {
+      this.closeWin(denops);
+    }
+    if (!maybe.lines || !maybe.lines.length) {
       return;
     }
-    this.showFloating(denops, maybe.lines, maybe.syntax, config);
+    this.showFloating(denops, maybe.lines, config);
   }
 
   async onResponce(denops: Denops, res: DocResponce, config: Config) {
@@ -113,11 +112,13 @@ export class DocHandler {
     if (info.selected != res.selected) return;
 
     const maybe = getLspContents(res.item, await op.filetype.getLocal(denops));
-    if ("close" in maybe) {
+    if (!maybe.found) {
       this.closeWin(denops);
+    }
+    if (!maybe.lines || !maybe.lines.length) {
       return;
     }
-    this.showFloating(denops, maybe.lines, maybe.syntax, config);
+    this.showFloating(denops, maybe.lines, config);
   }
 
   async closeWin(denops: Denops) {
