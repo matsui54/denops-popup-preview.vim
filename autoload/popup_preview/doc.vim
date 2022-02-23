@@ -1,7 +1,6 @@
 let s:Buffer = vital#popup_preview#import('VS.Vim.Buffer')
 let s:FloatingWindow = vital#popup_preview#import('VS.Vim.Window.FloatingWindow')
 let s:Window = vital#popup_preview#import('VS.Vim.Window')
-let s:Markdown = vital#popup_preview#import('VS.Vim.Syntax.Markdown')
 
 let s:win = s:FloatingWindow.new()
 call s:win.set_var('&wrap', 1)
@@ -16,7 +15,6 @@ function! s:ensure_buffer() abort
     call setbufvar(s:win.get_bufnr(), '&buftype', 'nofile')
     call setbufvar(s:win.get_bufnr(), '&buflisted', 0)
     call setbufvar(s:win.get_bufnr(), '&swapfile', 0)
-    call setbufvar(s:win.get_bufnr(), '___popup_preview_current_syntax', '')
   endif
 endfunction
 
@@ -41,6 +39,7 @@ function! popup_preview#doc#set_buffer(opts) abort
   call setbufvar(bufnr, '&bufhidden', 'hide')
   return bufnr 
 endfunction
+
 " floatOpt: FloatOption
 " events: autocmd.AutocmdEvent[]
 " width: number
