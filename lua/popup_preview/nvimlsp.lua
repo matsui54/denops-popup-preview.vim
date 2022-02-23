@@ -19,7 +19,7 @@ local get_resolved_item = function(arg)
     if res and not vim.tbl_isempty(res) then
       respond({item = res, selected = arg.selected})
     else
-      api.nvim_call_function("popup_preview#doc#close_floating", {})
+      api.nvim_call_function("popup_preview#doc#close_floating")
     end
   end)
 end

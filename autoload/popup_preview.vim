@@ -26,12 +26,14 @@ function s:register_autocmd() abort
           \ call popup_preview#notify('onCompleteChanged', [])
     autocmd InsertEnter * 
           \ call popup_preview#notify('onInsertEnter', [])
+
     autocmd TextChangedI * 
           \ if !popup_preview#pum#skip() |
-          \   call popup_preview#doc#close_floating([]) |
+          \   call popup_preview#doc#close_floating() |
           \ endif
-    autocmd CompleteDone * call popup_preview#doc#close_floating([])
-    autocmd User PumCompleteDone call popup_preview#doc#close_floating([])
+    autocmd CompleteDone,InsertLeave * 
+          \ call popup_preview#doc#close_floating()
+    autocmd User PumCompleteDone call popup_preview#doc#close_floating()
 
     autocmd ColorScheme * call <SID>init_highlight()
   augroup END

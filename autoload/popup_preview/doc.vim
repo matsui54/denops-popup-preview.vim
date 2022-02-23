@@ -18,7 +18,7 @@ function! s:ensure_buffer() abort
   endif
 endfunction
 
-function! popup_preview#doc#close_floating(opts) abort
+function! popup_preview#doc#close_floating(...) abort
   try
     call s:win.close()
   catch /E523:\|E5555:/
@@ -73,10 +73,6 @@ function! popup_preview#doc#show_floating(opts) abort
     endif
     if !has('nvim')
       redraw
-    endif
-    if len(opts.events)
-      execute printf("autocmd %s <buffer> ++once call popup_preview#doc#close_floating({})",
-            \ join(opts.events, ','))
     endif
   catch /E523:/
     " Ignore "Not allowed here"

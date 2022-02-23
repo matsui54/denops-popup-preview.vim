@@ -75,7 +75,6 @@ export class DocHandler {
       {
         lines: hiCtx.stripped,
         floatOpt: floatingOpt,
-        events: ["InsertLeave"],
         width: hiCtx.width,
         height: hiCtx.height,
         cmds: hiCtx.commands,
