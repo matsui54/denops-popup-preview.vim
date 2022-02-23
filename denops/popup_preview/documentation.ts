@@ -1,10 +1,5 @@
-import { batch, Denops, fn, op, vars } from "./deps.ts";
-import {
-  CompleteInfo,
-  CompletionItem,
-  FloatOption,
-  PopupPos,
-} from "./types.ts";
+import { Denops, op } from "./deps.ts";
+import { CompleteInfo, FloatOption, PopupPos } from "./types.ts";
 import { Config } from "./config.ts";
 import { getLspContents, searchUserdata } from "./integ.ts";
 import { getHighlights, makeFloatingwinSize } from "./markdown.ts";

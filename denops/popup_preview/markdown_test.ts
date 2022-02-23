@@ -1,7 +1,7 @@
 import { assertEquals } from "./deps.ts";
 import {
   convertInputToMarkdownLines,
-  getHighlights,
+  // getHighlights,
   getMarkdownFences,
 } from "./markdown.ts";
 
@@ -37,36 +37,36 @@ Deno.test("convertInputToMarkdownLines", () => {
   );
 });
 
-Deno.test("getHighlights", () => {
-  assertEquals(
-    getHighlights([
-      "hoge",
-      "```c",
-      "int a = 1",
-      "a=20",
-      "```",
-      "print",
-      "```python",
-      "a = 10",
-      "```",
-    ]),
-    [[
-      "hoge",
-      "int a = 1",
-      "a=20",
-      "print",
-      "a = 10",
-    ], [{
-      ft: "c",
-      start: 2,
-      finish: 3,
-    }, {
-      ft: "python",
-      start: 5,
-      finish: 5,
-    }]],
-  );
-});
+// Deno.test("getHighlights", () => {
+//   assertEquals(
+//     getHighlights([
+//       "hoge",
+//       "```c",
+//       "int a = 1",
+//       "a=20",
+//       "```",
+//       "print",
+//       "```python",
+//       "a = 10",
+//       "```",
+//     ]),
+//     [[
+//       "hoge",
+//       "int a = 1",
+//       "a=20",
+//       "print",
+//       "a = 10",
+//     ], [{
+//       ft: "c",
+//       start: 2,
+//       finish: 3,
+//     }, {
+//       ft: "python",
+//       start: 5,
+//       finish: 5,
+//     }]],
+//   );
+// });
 
 Deno.test("getMarkdownFences", () => {
   assertEquals(getMarkdownFences(["ts=typescript", "foo=hoge"]), {

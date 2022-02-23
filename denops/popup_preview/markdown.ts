@@ -1,4 +1,4 @@
-import { batch, Denops, fn, gather, vars } from "./deps.ts";
+import { Denops, fn, gather, vars } from "./deps.ts";
 type MarkedString = string | { language: string; value: string };
 export type MarkupKind = "plaintext" | "markdown";
 export type MarkupContent = {
