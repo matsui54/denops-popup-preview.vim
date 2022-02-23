@@ -25,6 +25,9 @@ function! popup_preview#doc#close_floating(opts) abort
     " Ignore "Not allowed here"
     return -1
   endtry
+  if !has('nvim')
+    redraw
+  endif
 endfunction
 
 function! popup_preview#doc#get_winid() abort
@@ -41,7 +44,6 @@ function! popup_preview#doc#set_buffer(opts) abort
 endfunction
 
 " floatOpt: FloatOption
-" events: autocmd.AutocmdEvent[]
 " width: number
 " cmds: string[]
 " height: number
@@ -68,6 +70,9 @@ function! popup_preview#doc#show_floating(opts) abort
       if opts.winblend
         call s:win.set_var('&winblend', opts.winblend)
       endif
+    endif
+    if !has('nvim')
+      redraw
     endif
     if len(opts.events)
       execute printf("autocmd %s <buffer> ++once call popup_preview#doc#close_floating({})",
