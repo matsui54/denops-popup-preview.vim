@@ -16,4 +16,5 @@ export function main(denops: Denops) {
       await handler.onDocResponce(denops, arg1 as DocResponce);
     },
   };
+  handler.getConfig(denops);
 }
