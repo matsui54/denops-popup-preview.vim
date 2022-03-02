@@ -1,27 +1,7 @@
 let s:is_enabled = 0
 
 function! popup_preview#enable() abort
-  if denops#plugin#is_loaded('popup_preview')
-    return
-  endif
   let s:is_enabled = 1
-
-  augroup PopupPreview
-    autocmd!
-  augroup END
-
-  if exists('g:loaded_denops') && denops#server#status() ==# 'running'
-    silent! call s:register()
-  else
-    autocmd PopupPreview User DenopsReady ++once silent! call s:register()
-  endif
-endfunction
-
-let s:root_dir = fnamemodify(expand('<sfile>'), ':h:h')
-function! s:register() abort
-  call denops#plugin#register('popup_preview',
-        \ denops#util#join_path(s:root_dir, 'denops', 'popup_preview', 'app.ts'),
-        \ { 'mode': 'reload' })
   call s:register_autocmd()
   call s:init_highlight()
 endfunction
