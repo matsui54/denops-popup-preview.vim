@@ -5,7 +5,18 @@ import { getLspContents, searchUserdata } from "./integ.ts";
 import { getStylizeCommands, makeFloatingwinSize } from "./markdown.ts";
 import { DocResponce } from "./event.ts";
 
+type DocCache = {
+  lines: string[];
+  index: number;
+};
+
 export class DocHandler {
+  private docCache: Record<string, DocCache> = {};
+
+  clearCache() {
+    this.docCache = {};
+  }
+
   private async showFloating(
     denops: Denops,
     lines: string[],
@@ -96,6 +107,11 @@ export class DocHandler {
       return;
     }
     const item = info["items"][info["selected"]];
+    const cache = this.docCache[item.abbr || item.word] ?? null;
+    if (cache && cache.index == info.selected) {
+      this.showFloating(denops, cache.lines, config);
+      return;
+    }
     const maybe = await searchUserdata(denops, item, config, info.selected);
     if (!maybe.found) {
       this.closeWin(denops);
@@ -103,6 +119,10 @@ export class DocHandler {
     if (!maybe.lines || !maybe.lines.length) {
       return;
     }
+    this.docCache[item.abbr || item.word] = {
+      lines: maybe.lines,
+      index: info.selected,
+    };
     this.showFloating(denops, maybe.lines, config);
   }
 
@@ -117,6 +137,11 @@ export class DocHandler {
     if (!maybe.lines || !maybe.lines.length) {
       return;
     }
+    const item = info["items"][info["selected"]];
+    this.docCache[item.abbr || item.word] = {
+      lines: maybe.lines,
+      index: info.selected,
+    };
     this.showFloating(denops, maybe.lines, config);
   }
 
