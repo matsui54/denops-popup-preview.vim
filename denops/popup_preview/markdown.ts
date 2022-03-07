@@ -171,8 +171,8 @@ export async function getHighlights(
       }
       i++;
       // if (contents[i] && !matchEnd(contents[i], match)) {
-        // stripped.push("---");
-        // markdownLines[stripped.length - 1] = true;
+      // stripped.push("---");
+      // markdownLines[stripped.length - 1] = true;
       //   stripped.push("```" + match.ft + " " + contents[i]);
       //   i++;
       // }
