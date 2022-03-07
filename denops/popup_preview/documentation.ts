@@ -128,8 +128,6 @@ export class DocHandler {
 
   async onResponce(denops: Denops, res: DocResponce, config: Config) {
     const info = await denops.call("popup_preview#pum#info") as CompleteInfo;
-    if (info.selected != res.selected) return;
-
     const maybe = getLspContents(res.item, await op.filetype.getLocal(denops));
     if (!maybe.found) {
       this.closeWin(denops);
@@ -137,11 +135,14 @@ export class DocHandler {
     if (!maybe.lines || !maybe.lines.length) {
       return;
     }
-    const item = info["items"][info["selected"]];
+    const item = info["items"][res.selected];
     this.docCache[item.abbr || item.word] = {
       lines: maybe.lines,
-      index: info.selected,
+      index: res.selected,
     };
+    if (info.selected != res.selected) {
+      return;
+    }
     this.showFloating(denops, maybe.lines, config);
   }
 
