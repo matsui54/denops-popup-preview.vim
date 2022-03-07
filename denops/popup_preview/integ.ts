@@ -152,7 +152,10 @@ export async function searchUserdata(
     return {
       lines: convertInputToMarkdownLines({
         language: filetype,
-        value: stylizeSnippet(decoded.vsnip.snippet),
+        value: await denops.call(
+          "vsnip#to_string",
+          decoded.vsnip.snippet,
+        ) as string,
       }, []),
       found: true,
     };
