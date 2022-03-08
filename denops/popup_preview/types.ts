@@ -1,4 +1,3 @@
-import { autocmd } from "./deps.ts";
 export type VimCompleteItem = {
   word: string;
   abbr?: string;

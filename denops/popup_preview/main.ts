@@ -5,13 +5,13 @@ export function main(denops: Denops) {
   const handler = new EventHandler();
 
   denops.dispatcher = {
-    async onCompleteChanged(_): Promise<void> {
-      await handler.onCompleteChanged(denops);
+    onCompleteChanged(): void {
+      handler.onCompleteChanged(denops);
     },
-    async onInsertEnter(_): Promise<void> {
-      await handler.onInsertEnter(denops);
+    onInsertEnter(): void {
+      handler.onInsertEnter(denops);
     },
-    async onInsertLeave(_): Promise<void> {
+    onInsertLeave(): void {
       handler.onInsertLeave(denops);
     },
     async respond(arg1: unknown): Promise<void> {

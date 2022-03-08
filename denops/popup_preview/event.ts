@@ -26,11 +26,11 @@ export class EventHandler {
     await this.getConfig(denops);
   }
 
-  async onInsertLeave(_denops: Denops): Promise<void> {
+  onInsertLeave(_denops: Denops): void {
     this.docHandler.clearCache();
   }
 
-  async onCompleteChanged(denops: Denops): Promise<void> {
+  onCompleteChanged(denops: Denops): void {
     // debounce
     clearTimeout(this.docTimer);
     this.docTimer = setTimeout(async () => {
