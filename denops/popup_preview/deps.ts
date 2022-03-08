@@ -1,4 +1,4 @@
-export type { Denops } from "https://deno.land/x/denops_std@v1.1.3/mod.ts";
+export type { Denops } from "https://deno.land/x/denops_std@v3.1.3/mod.ts";
 export {
   batch,
   gather,
