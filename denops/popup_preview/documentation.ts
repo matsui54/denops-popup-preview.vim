@@ -66,7 +66,7 @@ export class DocHandler {
     const hiCtx = await getStylizeCommands(denops, lines, {
       maxWidth: maxWidth,
       maxHeight: maxHeight,
-      separator: "",
+      separator: false,
       border: config.border,
     });
     const floatingOpt: FloatOption = {

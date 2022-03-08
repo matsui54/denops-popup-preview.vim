@@ -1,7 +1,7 @@
-import { assertEquals } from "./deps.ts";
+import { assertEquals } from "./deps_test.ts";
 import { Config, makeConfig } from "./config.ts";
 
-Deno.test("test makeConfig", () => {
+Deno.test("makeConfig merges user config with default", () => {
   const userconfig: unknown = {
     enable: false,
     winblend: 10,

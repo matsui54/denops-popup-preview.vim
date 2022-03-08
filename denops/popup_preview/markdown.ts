@@ -6,15 +6,15 @@ export type MarkupContent = {
   value: string;
 };
 
-// --- Converts any of `MarkedString` | `MarkedString[]` | `MarkupContent` into
-// --- a list of lines containing valid markdown. Useful to populate the hover
-// --- window for `textDocument/hover`, for parsing the result of
-// --- `textDocument/signatureHelp`, and potentially others.
-// ---
-// --@param input (`MarkedString` | `MarkedString[]` | `MarkupContent`)
-// --@param contents (table, optional, default `{}`) List of strings to extend with converted lines
-// --@returns {contents}, extended with lines of converted markdown.
-// --@see https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_hover
+/**
+ * Converts any of `MarkedString` | `MarkedString[]` | `MarkupContent` into
+ * a list of lines containing valid markdown.
+ *
+ * @param input
+ * @param List of strings to extend with converted lines
+ * @returns contents extended with lines of converted markdown.
+ * @see https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_hover
+ */
 export function convertInputToMarkdownLines(
   input: MarkedString | MarkedString[] | MarkupContent,
   contents: string[],
@@ -46,6 +46,9 @@ export function convertInputToMarkdownLines(
   return contents;
 }
 
+/**
+ * Calculate window size in Vim from the given contents.
+ */
 export async function makeFloatingwinSize(
   denops: Denops,
   lines: string[],
@@ -72,7 +75,17 @@ export async function makeFloatingwinSize(
   return [width, height];
 }
 
-export function getMarkdownFences(items: string[]) {
+/**
+ * Get fenced languages for markdown
+ */
+export async function getMarkdownFences(
+  denops: Denops,
+): Promise<Record<string, string>> {
+  const items = await vars.g.get(
+    denops,
+    "markdown_fenced_languages",
+    [],
+  ) as string[];
   const fences: Record<string, string> = {};
   for (const item of items) {
     const maybe = item.split("=");
@@ -117,7 +130,7 @@ type HighlightContext = {
 type FloatOption = {
   maxWidth: number;
   maxHeight: number;
-  separator?: string;
+  separator?: boolean;
   border: boolean;
 };
 
@@ -132,13 +145,7 @@ export async function getHighlights(
     code: { ft: "", begin: "<code>", end: "<\/code>" }, // code
     text: { ft: "plaintex", begin: "<text>", end: "<\/text>" }, // text
   };
-  const fences = getMarkdownFences(
-    await vars.g.get(
-      denops,
-      "markdown_fenced_languages",
-      [],
-    ) as string[],
-  );
+  const fences = await getMarkdownFences(denops);
 
   function matchBegin(line: string): Match | null {
     for (const type of Object.keys(matchers)) {
@@ -170,17 +177,9 @@ export async function getHighlights(
         match.ft = fences[match.ft] ? fences[match.ft] : match.ft;
       }
       i++;
-      // if (contents[i] && !matchEnd(contents[i], match)) {
-      // stripped.push("---");
-      // markdownLines[stripped.length - 1] = true;
-      //   stripped.push("```" + match.ft + " " + contents[i]);
-      //   i++;
-      // }
       while (i < contents.length) {
         const fencedLine = contents[i];
         if (matchEnd(fencedLine, match)) {
-          // stripped[stripped.length - 1] = stripped[stripped.length - 1] +
-          //   " ```";
           i++;
           break;
         }
@@ -193,12 +192,13 @@ export async function getHighlights(
         finish: stripped.length,
       });
       // add separator
-      if (i < contents.length) {
-        stripped.push("");
+      if (opts.separator && i < contents.length) {
+        stripped.push("---");
         markdownLines[stripped.length - 1] = true;
       }
     } else {
-      // strip any emty lines or separators prior to this separator in actual markdown
+      // strip any empty lines or separators prior
+      // to this separator in actual markdown
       if (/^---+$/.test(line)) {
         while (
           markdownLines[stripped.length - 1] &&
@@ -249,21 +249,15 @@ export async function getStylizeCommands(
   opts: FloatOption,
 ): Promise<HighlightContext> {
   const hiContents = await getHighlights(denops, lines, opts);
-  const fences = getMarkdownFences(
-    await vars.g.get(
-      denops,
-      "markdown_fenced_languages",
-      [],
-    ) as string[],
-  );
+  const fences = await getMarkdownFences(denops);
   const cmds: string[] = [];
   let index = 0;
   const langs: Record<string, boolean> = {};
-  function applySyntax(
+  const applySyntax = (
     ft: string | null,
     start: number,
     finish: number,
-  ) {
+  ) => {
     if (!ft) {
       cmds.push(
         `syntax region markdownCode start=/\\%${start}l/ end=/\\%${
@@ -288,7 +282,7 @@ export async function getStylizeCommands(
         1
       }l/ contains=${lang} keepend`,
     );
-  }
+  };
 
   cmds.push("syntax clear");
 
