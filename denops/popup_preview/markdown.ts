@@ -7,6 +7,27 @@ export type MarkupContent = {
 };
 
 /**
+ * Trims first/end empty lines from input
+ */
+export function trimLines(lines: string[]): string[] {
+  let start = 0;
+  let end = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim().length) {
+      start = i;
+      break;
+    }
+  }
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].trim().length) {
+      end = i + 1;
+      break;
+    }
+  }
+  return lines.slice(start, end);
+}
+
+/**
  * Converts any of `MarkedString` | `MarkedString[]` | `MarkupContent` into
  * a list of lines containing valid markdown.
  *
@@ -146,6 +167,7 @@ export async function getHighlights(
     text: { ft: "plaintex", begin: "<text>", end: "<\/text>" }, // text
   };
   const fences = await getMarkdownFences(denops);
+  contents = trimLines(contents);
 
   function matchBegin(line: string): Match | null {
     for (const type of Object.keys(matchers)) {
