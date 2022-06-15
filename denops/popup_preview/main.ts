@@ -11,9 +11,6 @@ export function main(denops: Denops) {
     async onInsertEnter(): Promise<void> {
       await handler.onInsertEnter(denops);
     },
-    async onInsertLeave(): Promise<void> {
-      await handler.onInsertLeave(denops);
-    },
     async respond(arg1: unknown): Promise<void> {
       await handler.onDocResponce(denops, arg1 as DocResponce);
     },

@@ -23,11 +23,8 @@ export class EventHandler {
   }
 
   async onInsertEnter(denops: Denops): Promise<void> {
-    await this.getConfig(denops);
-  }
-
-  onInsertLeave(_denops: Denops): void {
     this.docHandler.clearCache();
+    await this.getConfig(denops);
   }
 
   onCompleteChanged(denops: Denops): void {
