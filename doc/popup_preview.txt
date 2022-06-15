@@ -114,6 +114,10 @@ delay					*denops-popup-preview-option-delay*
 		Set 0 to disable debouncing.
 		(default: 30)
 
+debug					*denops-popup-preview-option-debug*
+		If it is true, output the debug log to the console.
+		(default: v:false)
+
 ==============================================================================
 EXAMPLE					*denops-popup-preview-example*
 >

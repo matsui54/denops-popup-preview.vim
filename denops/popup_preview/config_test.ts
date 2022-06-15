@@ -16,5 +16,6 @@ Deno.test("makeConfig merges user config with default", () => {
     supportUltisnips: true,
     delay: 50,
     winblend: 10,
+    debug: false,
   });
 });

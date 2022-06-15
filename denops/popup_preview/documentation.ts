@@ -123,6 +123,9 @@ export class DocHandler {
       lines: maybe.lines,
       index: info.selected,
     };
+    if (config.debug) {
+      console.log({ lines: maybe.lines });
+    }
     this.showFloating(denops, maybe.lines, config);
   }
 
@@ -142,6 +145,9 @@ export class DocHandler {
     };
     if (info.selected != res.selected) {
       return;
+    }
+    if (config.debug) {
+      console.log({ lines: maybe.lines });
     }
     this.showFloating(denops, maybe.lines, config);
   }

@@ -7,6 +7,7 @@ export type Config = {
   supportInfo: boolean;
   supportUltisnips: boolean;
   delay: number;
+  debug: boolean;
 };
 
 export function getDefaultDocConfig(): Config {
@@ -18,6 +19,7 @@ export function getDefaultDocConfig(): Config {
     supportInfo: true,
     supportUltisnips: true,
     delay: 50,
+    debug: false,
   };
 }
 
