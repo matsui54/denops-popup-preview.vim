@@ -11,7 +11,7 @@ call s:win.set_var("&foldenable", 0)
 
 function! s:ensure_buffer() abort
   if !bufexists(s:win.get_bufnr())
-    call s:win.set_bufnr(s:Buffer.create())
+    noautocmd keepalt keepjumps call s:win.set_bufnr(s:Buffer.create())
     call setbufvar(s:win.get_bufnr(), '&buftype', 'nofile')
     call setbufvar(s:win.get_bufnr(), '&buflisted', 0)
     call setbufvar(s:win.get_bufnr(), '&swapfile', 0)
@@ -60,7 +60,7 @@ function! popup_preview#doc#show_floating(opts) abort
   try
     call popup_preview#doc#set_buffer(opts)
 
-    call s:win.open(win_opts)
+    noautocmd keepalt keepjumps call s:win.open(win_opts)
     if has_key(opts, 'cmds') && len(opts.cmds)
       call s:Window.do(s:win.get_winid(), { -> execute(join(opts.cmds, "\n"), 'silent') })
     endif
