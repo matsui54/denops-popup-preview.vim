@@ -100,7 +100,6 @@ export class DocHandler {
   ): Promise<void> {
     const info = await denops.call("popup_preview#pum#info") as CompleteInfo;
     if (
-      // info["mode"] != "eval" ||
       info["selected"] == -1
     ) {
       this.closeWin(denops);
