@@ -28,7 +28,7 @@ function s:register_autocmd() abort
           \ call popup_preview#notify('onInsertEnter', [])
 
     autocmd TextChangedI * 
-          \ if !popup_preview#pum#skip() |
+          \ if !popup_preview#pum#skip() && !popup_preview#pum#visible() |
           \   call popup_preview#doc#close_floating() |
           \ endif
     autocmd CompleteDone,InsertLeave * 
