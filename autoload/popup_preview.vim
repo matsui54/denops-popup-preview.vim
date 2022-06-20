@@ -27,13 +27,10 @@ function s:register_autocmd() abort
     autocmd InsertEnter * 
           \ call popup_preview#notify('onInsertEnter', [])
 
-    autocmd TextChangedI * 
-          \ if !popup_preview#pum#skip() |
-          \   call popup_preview#doc#close_floating() |
-          \ endif
     autocmd CompleteDone,InsertLeave * 
           \ call popup_preview#doc#close_floating()
     autocmd User PumCompleteDone call popup_preview#doc#close_floating()
+    autocmd User PumClose call popup_preview#doc#close_floating()
 
     autocmd ColorScheme * call <SID>init_highlight()
   augroup END
