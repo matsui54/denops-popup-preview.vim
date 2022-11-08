@@ -58,7 +58,7 @@ export class DocHandler {
       );
       align = "right";
     }
-    if (maxWidth < 1) {
+    if (maxWidth < 1 || maxHeight < 1) {
       this.closeWin(denops);
       return;
     }
@@ -77,7 +77,7 @@ export class DocHandler {
       border: config.border,
     };
 
-    if (hiCtx.width < 1) {
+    if (hiCtx.width < 1 || hiCtx.height < 1) {
       this.closeWin(denops);
       return;
     }
