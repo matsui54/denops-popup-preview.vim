@@ -20,14 +20,14 @@ endfunction
 function s:register_autocmd() abort
   augroup PopupPreview
     autocmd!
-    autocmd CompleteChanged * 
+    autocmd CompleteChanged *
           \ call popup_preview#notify('onCompleteChanged', [])
     autocmd User PumCompleteChanged
           \ call popup_preview#notify('onCompleteChanged', [])
-    autocmd InsertEnter * 
+    autocmd InsertEnter *
           \ call popup_preview#notify('onInsertEnter', [])
 
-    autocmd CompleteDone,InsertLeave * 
+    autocmd CompleteDone,InsertLeave *
           \ call popup_preview#doc#close_floating()
     autocmd User PumCompleteDone call popup_preview#doc#close_floating()
     autocmd User PumClose call popup_preview#doc#close_floating()

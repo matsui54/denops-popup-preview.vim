@@ -1,6 +1,6 @@
 " retrieved code from neovim syntax/lsp_markdown.vim
 
-" Source Vim/Neovim builtin syntax file 
+" Source Vim/Neovim builtin syntax file
 " instead of any other installed syntax files
 execute 'source' $VIMRUNTIME .. '/syntax/markdown.vim'
 
@@ -12,7 +12,7 @@ syntax region markdownEscape matchgroup=markdownEscape
       \ end=/./ containedin=ALL keepend oneline concealends
 
 " conceal html entities
-syntax match mkdNbsp /&nbsp;/ conceal cchar= 
+syntax match mkdNbsp /&nbsp;/ conceal cchar=
 syntax match mkdLt /&lt;/  conceal cchar=<
 syntax match mkdGt /&gt;/  conceal cchar=>
 syntax match mkdAmp /&amp;/  conceal cchar=&

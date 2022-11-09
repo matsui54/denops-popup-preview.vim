@@ -40,7 +40,7 @@ function! popup_preview#doc#set_buffer(opts) abort
   call setbufline(bufnr, 1, a:opts.lines)
   call setbufvar(bufnr, '&modified', 0)
   call setbufvar(bufnr, '&bufhidden', 'hide')
-  return bufnr 
+  return bufnr
 endfunction
 
 " floatOpt: FloatOption
