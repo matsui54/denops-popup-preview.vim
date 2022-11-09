@@ -74,7 +74,7 @@ PopupPreviewBorder			*hl-PopupPreviewBorder*
 ==============================================================================
 OPTIONS						*denops-popup-preview-options*
 
-You can customize |denops-popup-preview| with global variable 
+You can customize |denops-popup-preview| with global variable
 *g:popup_preview_config* .
 |g:popup_preview_config| is a dictionary which has the following keys.
 

@@ -23,7 +23,7 @@ export class DocHandler {
     config: Config,
   ) {
     const pumInfo = await denops.call("popup_preview#pum#get_pos") as PopupPos;
-    if (!pumInfo || !pumInfo.col) {
+    if (!pumInfo || pumInfo.col < 0) {
       this.closeWin(denops);
       return;
     }

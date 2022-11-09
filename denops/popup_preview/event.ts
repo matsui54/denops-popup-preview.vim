@@ -31,6 +31,7 @@ export class EventHandler {
     // debounce
     clearTimeout(this.docTimer);
     this.docTimer = setTimeout(async () => {
+      await this.getConfig(denops);
       await this.docHandler.showCompleteDoc(denops, this.config);
     }, this.config.delay);
   }
