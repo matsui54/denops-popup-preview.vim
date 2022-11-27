@@ -93,7 +93,7 @@ export async function makeFloatingwinSize(
     height += Math.floor((w ? w - 1 : 0) / width) + 1;
   }
   height = Math.min(maxHeight, height);
-  return [width, height];
+  return [Math.max(width, 0), Math.max(height, 0)];
 }
 
 /**
