@@ -1,4 +1,5 @@
-import { assertEquals, test } from "./deps_test.ts";
+import { assertEquals } from "./deps_test.ts";
+import { test } from "https://deno.land/x/denops_test@v1.1.0/mod.ts";
 import { path, vars } from "./deps.ts";
 import {
   convertInputToMarkdownLines,

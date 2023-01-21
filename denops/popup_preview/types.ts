@@ -15,7 +15,7 @@ export type CompleteInfo = {
 
 export type UserData = JsonUserData | string;
 
-export type JsonUserData = DdcLspData | VsnipData | null;
+export type JsonUserData = DdcLspData | VsnipData | UltisnipsData | null;
 
 export type DdcLspData = {
   lspitem: CompletionItem;
