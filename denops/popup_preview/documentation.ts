@@ -138,6 +138,9 @@ export class DocHandler {
       return;
     }
     const item = info["items"][res.selected];
+    if (!item) {
+      return;
+    }
     this.docCache[item.abbr || item.word] = {
       lines: maybe.lines,
       index: res.selected,
