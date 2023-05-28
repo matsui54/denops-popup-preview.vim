@@ -1,4 +1,3 @@
-let s:Buffer = vital#popup_preview#import('VS.Vim.Buffer')
 let s:FloatingWindow = vital#popup_preview#import('VS.Vim.Window.FloatingWindow')
 let s:Window = vital#popup_preview#import('VS.Vim.Window')
 
@@ -10,12 +9,18 @@ call s:win.set_var('&linebreak', 1)
 call s:win.set_var("&foldenable", 0)
 
 function! s:ensure_buffer() abort
-  if !bufexists(s:win.get_bufnr())
-    noautocmd keepalt keepjumps call s:win.set_bufnr(s:Buffer.create())
-    call setbufvar(s:win.get_bufnr(), '&buftype', 'nofile')
-    call setbufvar(s:win.get_bufnr(), '&buflisted', 0)
-    call setbufvar(s:win.get_bufnr(), '&swapfile', 0)
+  if bufexists(s:win.get_bufnr())
+    return
   endif
+
+  " Create new buffer
+  let bufname = 'denops-popup-preview:'
+  let bufnr = bufadd(bufname)
+  call bufload(bufnr)
+  noautocmd keepalt keepjumps call s:win.set_bufnr(bufnr)
+  call setbufvar(s:win.get_bufnr(), '&buftype', 'nofile')
+  call setbufvar(s:win.get_bufnr(), '&buflisted', 0)
+  call setbufvar(s:win.get_bufnr(), '&swapfile', 0)
 endfunction
 
 function! popup_preview#doc#close_floating(...) abort
