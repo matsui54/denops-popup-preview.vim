@@ -1,4 +1,4 @@
-import { Denops, isLike, op } from "./deps.ts";
+import { Denops, is, op } from "./deps.ts";
 import {
   CompletionItem,
   JsonUserData,
@@ -88,8 +88,15 @@ export async function searchUserdata(
   }
   const filetype = await op.filetype.getLocal(denops);
   let decoded: JsonUserData = null;
-  if (isLike({ lspitem: "" }, item.user_data)) {
+  if (is.ObjectOf({ lspitem: is.String })(item.user_data)) {
     decoded = { lspitem: JSON.parse(item.user_data.lspitem) as CompletionItem };
+  } else if (
+    is.ObjectOf({ vsnip: is.ObjectOf({ snippet: is.ArrayOf(is.String) }) })(
+      item.user_data,
+    )
+  ) {
+    // ddc-source-vsnip
+    decoded = item.user_data;
   } else if (typeof item.user_data == "string") {
     try {
       decoded = JSON.parse(item.user_data) as JsonUserData;

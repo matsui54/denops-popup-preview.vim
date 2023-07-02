@@ -1,4 +1,4 @@
-import { Denops, fn, gather, vars } from "./deps.ts";
+import { collect, Denops, fn, vars } from "./deps.ts";
 type MarkedString = string | { language: string; value: string };
 export type MarkupKind = "plaintext" | "markdown";
 export type MarkupContent = {
@@ -81,11 +81,10 @@ export async function makeFloatingwinSize(
     maxWidth -= 2;
     maxHeight -= 2;
   }
-  const widths = await gather(denops, async (denops) => {
-    for (const line of lines) {
-      await fn.strdisplaywidth(denops, line);
-    }
-  }) as number[];
+  const widths = await collect(
+    denops,
+    (denops) => lines.map((line) => fn.strdisplaywidth(denops, line)),
+  );
   const width = Math.min(Math.max(...widths), maxWidth);
 
   let height = 0;
