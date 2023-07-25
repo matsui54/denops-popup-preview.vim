@@ -31,7 +31,9 @@ function! popup_preview#doc#close_floating(...) abort
     " Ignore "Not allowed here"
     return -1
   endtry
-  if !has('nvim')
+
+  " NOTE: redraw is needed for Vim8 or command line mode
+  if !has('nvim') || mode() ==# 'c'
     redraw
   endif
 endfunction
@@ -77,7 +79,9 @@ function! popup_preview#doc#show_floating(opts) abort
         call s:win.set_var('&winblend', opts.winblend)
       endif
     endif
-    if !has('nvim')
+
+    " NOTE: redraw is needed for Vim8 or command line mode
+    if !has('nvim') || mode() ==# 'c'
       redraw
     endif
   catch /E523:/
