@@ -38,7 +38,7 @@ endfunction
 
 function! s:init_highlight() abort
   highlight default link PopupPreviewDocument NormalFloat
-  highlight default link PopupPreviewBorder NormalFloat
+  highlight default link PopupPreviewBorder FloatBorder
 endfunction
 
 function! popup_preview#notify(method, arg) abort
