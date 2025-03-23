@@ -14,7 +14,7 @@ end
 local get_resolved_item = function(arg)
   local item = arg.decoded
   -- ignore E5018: Some language server make boolean a key of CompletionItem
-  pcall(vim.lsp.buf_request, 0, 'completionItem/resolve', item, function(_, arg1, arg2)
+  pcall(vim.lsp.buf_request_all, 0, 'completionItem/resolve', item, function(_, arg1, arg2)
     local res = is_new_handler(arg1) and arg1 or arg2
     if res and not vim.tbl_isempty(res) then
       respond({item = res, selected = arg.selected})
