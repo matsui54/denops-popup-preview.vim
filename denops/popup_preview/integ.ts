@@ -1,4 +1,12 @@
-import { Denops, is, op } from "./deps.ts";
+import {
+  DdcItem,
+  Denops,
+  is,
+  op,
+  Predicate,
+  PreviewContext,
+  Previewer,
+} from "./deps.ts";
 import {
   CompletionItem,
   JsonUserData,
@@ -77,12 +85,67 @@ export function getLspContents(
   return { lines: lines, found: true };
 }
 
+async function getDdcPreviewerContents(
+  denops: Denops,
+  item: DdcItem,
+  config: Config,
+): Promise<string[] | null> {
+  const context: PreviewContext = {
+    height: config.maxHeight,
+    width: config.maxWidth,
+    isFloating: true,
+  };
+  const previewer = await denops.dispatch(
+    "ddc",
+    "getPreviewer",
+    item,
+    context,
+  ) as Previewer;
+  const { kind } = previewer;
+  switch (kind) {
+    case "empty":
+      break; // no data
+    case "command":
+      break; // not implemented
+    case "help":
+      break; // not implemented
+    case "markdown": {
+      if (previewer.contents.length === 0) break; // no data
+      return previewer.contents;
+    }
+    case "text": {
+      if (previewer.contents.length === 0) break; // no data
+      return convertInputToMarkdownLines({
+        kind: "plaintext",
+        value: previewer.contents.join("\n"),
+      }, []);
+    }
+    default: {
+      kind satisfies never; // exhaustive check
+      break; // unknown kind
+    }
+  }
+  return null;
+}
+
+const isDdcItemLike = is.ObjectOf({
+  __sourceName: is.String,
+}) satisfies Predicate<Pick<DdcItem, "__sourceName">>;
+
 export async function searchUserdata(
   denops: Denops,
-  item: VimCompleteItem,
+  item: VimCompleteItem | DdcItem,
   config: Config,
   selected: number,
 ): Promise<SearchResult> {
+  // ddc-previewer
+  if (isDdcItemLike(item)) {
+    const lines = await getDdcPreviewerContents(denops, item, config);
+    if (lines) {
+      return { lines, found: true };
+    }
+  }
+
   if (!item.user_data) {
     return getInfoField(item, config);
   }
