@@ -1,14 +1,14 @@
-export type { Denops } from "https://deno.land/x/denops_std@v6.5.1/mod.ts";
+export type { Denops } from "jsr:@denops/std@7.5.0";
 export {
   batch,
   collect,
-} from "https://deno.land/x/denops_std@v6.5.1/batch/mod.ts";
-export * as op from "https://deno.land/x/denops_std@v6.5.1/option/mod.ts";
-export * as path from "https://deno.land/std@0.224.0/path/mod.ts";
-export * as fn from "https://deno.land/x/denops_std@v6.5.1/function/mod.ts";
-export * as nvimFn from "https://deno.land/x/denops_std@v6.5.1/function/nvim/mod.ts";
-export * as vars from "https://deno.land/x/denops_std@v6.5.1/variable/mod.ts";
-export * as autocmd from "https://deno.land/x/denops_std@v6.5.1/autocmd/mod.ts";
+} from "jsr:@denops/std@7.5.0/batch";
+export * as op from "jsr:@denops/std@7.5.0/option";
+export * as path from "jsr:@std/path@1.1.0";
+export * as fn from "jsr:@denops/std@7.5.0/function";
+export * as nvimFn from "jsr:@denops/std@7.5.0/function/nvim";
+export * as vars from "jsr:@denops/std@7.5.0/variable";
+export * as autocmd from "jsr:@denops/std@7.5.0/autocmd";
 export {
   is,
   type Predicate,
